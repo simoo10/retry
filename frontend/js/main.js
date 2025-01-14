@@ -16,7 +16,7 @@ const navbar = document.getElementById('landing-navbar');
 const home_navbar = document.getElementById('home-navbar');
 //function to handle navigation
 
-function handling_navigation(route,updateHistory = true){
+export function handling_navigation(route,updateHistory = true){
     console.log("Route: ",route);
     const exact_route = routes.find(r => r.link === route);
     if(exact_route)
@@ -56,16 +56,27 @@ async function get_content(template){
             // change_css(`css/${css_file}.css`);
             // console.log("CSS File: ",css_file);
             console.log("CSS Link: ",css_link);
-            if(template==="login.html" || template==="signup.html"){
+            if(template==="login.html" || template==="signup.html")
+            {
                 navbar.style.display = "none";
                 home_navbar.style.display = "none";
                 if(template==="login.html"){
                 import(`./authentication.js`).then(module => {
                     module.log42();
+                    module.login();
                 }).catch(error => {
                     console.error('Error in importing the module:', error);
                 } );
-            }
+                }
+                else if(template==="signup.html")
+                {
+                    import(`./authentication.js`).then(module => {
+                        module.simplelog();
+                    }).catch(error => {
+                        console.error('Error in importing the module:', error);
+                    } );
+                    
+                }
             }
             else if(template==="landing.html"){
                 navbar.style.display = "block";

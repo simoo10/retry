@@ -40,9 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
-    # 'django.contrib.sites',
-    # 'social_django',
-    # 'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
+   
 ]
 
 MIDDLEWARE = [
@@ -139,38 +138,62 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-OAUTH_42_CLIENT_ID = 'u-s4t2ud-4db1d593edef49931bdbd761f4ab2d0e92015d139e159f226527e55da2e3e291'
-OAUTH_42_CLIENT_SECRET = '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'
+OAUTH_42_CLIENT_ID = 'u-s4t2ud-6806dddf3efaba264ea3d097b8389fc849797a74c2374fcbe7a30d499de07d07'
+OAUTH_42_CLIENT_SECRET = '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'
 OAUTH_42_REDIRECT_URI = 'http://localhost:8000/api/intra42callback/'
 OAUTH_42_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_42_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
 OAUTH_42_API_BASE_URL = 'https://api.intra.42.fr/v2'
 
 
-# settings.py
-# from datetime import timedelta # import this library top of the settings.py file
-
-# put on your settings.py file below INSTALLED_APPS
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-# }
+#all the views api i have will use jwt by default
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+     'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
-# AUTHENTICATION_BACKENDS = (
-#     'social_core.backends.github.GithubOAuth2',  # Intra42 uses the GitHub OAuth2 backend
-#     'django.contrib.auth.backends.ModelBackend',  # Default backend for handling standard Django login
-# )
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1, minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1), 
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
 
-JWT_SECRET_KEY = 'api'  # A unique and secure key for signing tokens
-JWT_ALGORITHM = 'HS256'  # Algorithm used for signing (HS256 is widely used)
-JWT_EXPIRATION_SECONDS = 3600  # Token validity in seconds (1 hour here)
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": "",
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JSON_ENCODER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "email",
+    "USER_ID_CLAIM": "intra_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}

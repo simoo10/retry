@@ -7,7 +7,49 @@ const routes = [
     {link:'/dashboard',template:'dashboard.html'},
     {link:'/friends',template:'friends.html'},
     {link:'/leaderboard',template:'leaderboard.html'},
+    {link:'/test' ,template:'test.html'},
 ];
+
+async function fetchUserData(accessToken) {
+    try {
+        const response = await fetch('http://localhost:8000/api/user_data/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            console.log('User data:', userData);
+            // You can update the UI here with user data
+            document.getElementById('userData').textContent = JSON.stringify(userData, null, 2);
+        } else if (response.status === 401) {
+            console.error('Unauthorized: Invalid or expired token');
+            document.getElementById('userData').textContent = 'Unauthorized: Invalid or expired token';
+        } else {
+            console.error('Failed to fetch user data');
+            document.getElementById('userData').textContent = 'Failed to fetch user data';
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        document.getElementById('userData').textContent = 'Error fetching user data';
+    }
+}
+
+function handleFetchClick() {
+    console.log('Fetching user data!!!!!!!!!');
+    const accessToken = document.getElementById('accessToken').value;
+    fetchUserData(accessToken);
+}
+
+window.handleFetchClick = handleFetchClick;
+
+
+
+
+
 
 const content = document.getElementById('page-content');
 const profile_content = document.getElementById('profiles-content');
@@ -64,6 +106,7 @@ async function get_content(template){
                 import(`./authentication.js`).then(module => {
                     module.log42();
                     module.login();
+                    module.handleCallbackResponse();
                 }).catch(error => {
                     console.error('Error in importing the module:', error);
                 } );

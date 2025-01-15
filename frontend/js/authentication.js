@@ -1,12 +1,48 @@
 //42 authentication function for login
 
+// export function log42(){
+//     document.getElementById('log-42').addEventListener('click', async () => {
+//         console.log('Login with 42 button clicked');
+//         const urlParams = new URLSearchParams(window.location.search);
+//         const login = urlParams.get('login');
+//         const email = urlParams.get('email');
+//         console.log(`Logged in user: ${login}, Email: ${email}`);
+
+//         try {
+//             // Fetch the Intra42 authentication URL from the backend
+//             const response = await fetch('http://localhost:8000/api/login_with_42/', {
+//                 method: 'GET',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//             });
+    
+//             if (response.ok) {
+//                 // Extract the URL and redirect the user
+//                 const data = await response.json();
+//                 if (data.url) {
+//                     window.location.href = data.url; // Redirect to Intra42 authentication page
+//                 } else {
+//                     console.error('URL not found in response');
+//                 }
+//                 return('ok');
+//             } else {
+//                 console.error('Failed to fetch authentication URL');
+//             }
+//         } catch (error) {
+//             console.error('Error during login:', error);
+//             return('ko');
+//         }
+//     });
+// }
+
 export function log42(){
     document.getElementById('log-42').addEventListener('click', async () => {
         console.log('Login with 42 button clicked');
         const urlParams = new URLSearchParams(window.location.search);
         const login = urlParams.get('login');
         const email = urlParams.get('email');
-        console.log(`Logged in user: ${login}, Email: ${email}`);
+    console.log(`Logged in user: ${login}, Email: ${email}`);
 
         try {
             // Fetch the Intra42 authentication URL from the backend
@@ -21,20 +57,94 @@ export function log42(){
                 // Extract the URL and redirect the user
                 const data = await response.json();
                 if (data.url) {
+                    
                     window.location.href = data.url; // Redirect to Intra42 authentication page
                 } else {
                     console.error('URL not found in response');
                 }
-                return('ok');
             } else {
                 console.error('Failed to fetch authentication URL');
             }
         } catch (error) {
             console.error('Error during login:', error);
-            return('ko');
         }
     });
 }
+
+
+
+export function handleCallbackResponse() {
+    // Check if tokens are present in cookies (set by the backend)
+    const accessToken = getCookie('access_token');
+    const refreshToken = getCookie('refresh_token');
+
+    if (accessToken && refreshToken) {
+        console.log('Tokens retrieved:', { accessToken, refreshToken });
+
+        // Use the tokens to fetch user data
+        fetchUserData(accessToken);
+    } else {
+        console.error('No tokens found');
+    }
+    
+}
+
+// Helper function to get cookies
+export function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+
+export async function fetchUserData(accessToken) {
+    try {
+        const response = await fetch('http://localhost:8000/api/user_data/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            console.log('User data:', userData);
+         // Update the UI with user data
+        } else if (response.status === 401) {
+            console.error('Unauthorized: Invalid or expired token');
+            // Display user data on the page (e.g., login, email, etc.)
+        } else {
+            console.error('Failed to fetch user data');
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
+
+async function refreshAccessToken(refreshToken) {
+    try {
+        const response = await fetch('http://localhost:8000/api/token_refresh/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const newAccessToken = data.access;
+            console.log('New access token:', newAccessToken);
+            return newAccessToken;
+        } else {
+            console.error('Failed to refresh access token');
+        }
+    } catch (error) {
+        console.error('Error refreshing access token:', error);
+    }
+}
+
+
 //simple authentication for Sign Up
 
 export function simplelog() {

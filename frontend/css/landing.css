@@ -20,7 +20,7 @@ body{
     background-color: var(--background-color);
 }
 #landing-navbar{
-    background-color: var(--background-color2);
+    background-color:#ffffff;
 }
 #logo{
     width: 150px;

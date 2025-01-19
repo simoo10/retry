@@ -10,8 +10,104 @@ const routes = [
     {link:'/test' ,template:'test.html'},
 ];
 
+// function getCookie(name) {
+//     const value = `; ${document.cookie}`;
+//     const parts = value.split(`; ${name}=`);
+//     if (parts.length === 2) return parts.pop().split(";").shift();
+//     return null;
+// }
+
+//   async function refreshAccessToken() {
+//     const refreshToken = getCookie('refresh_token'); // Assuming the refresh token is stored in a cookie
+
+//     if (!refreshToken) {
+//         console.error('No refresh token available');
+//         return null;
+//     }
+
+//     try {
+//         const response = await fetch('http://localhost:8000/api/token_refresh/', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ refresh: refreshToken }),
+//         });
+
+//         if (response.ok) {
+//             const data = await response.json();
+//             // Save the new access token in a cookie or local storage
+//             setCookie('access_token', data.access, 1); // Example of saving in a cookie for 1 day
+//             return data.access; // Return the new access token
+//         } else {
+//             console.error('Failed to refresh access token');
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error('Error refreshing access token:', error);
+//         return null;
+//     }
+// }
+function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+// async function fetchUserData(accessToken) {
+//     accessToken = getCookie('access_token');
+
+//     try {
+//         console.log(accessToken);
+
+//         const response = await fetch('http://localhost:8000/api/user_data/', {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': `Bearer ${accessToken}`,
+//                 'Content-Type': 'application/json',
+//             },
+//         });
+
+//         if (response.ok) {
+//             const userData = await response.json();
+//             console.log('User data:', userData);
+//             document.getElementById('userData').textContent = JSON.stringify(userData, null, 2);
+//         } else if (response.status === 401) {
+//             console.log("gggggggggggggggggggggggg");
+//             console.warn('Token expired, attempting to refresh token...');
+//             const newAccessToken = await refreshAccessToken();
+//             console.log("-->",newAccessToken);
+//             if (newAccessToken) {
+//                 console.log('Retrying with new access token...');
+//                 // Retry the request with the new token
+//                 return fetchUserData(newAccessToken);
+//             } else {
+//                 console.error('Failed to refresh token. Redirecting to login...');
+//                 document.getElementById('userData').textContent = 'Session expired. Please log in again.';
+//                 // Redirect to login page
+//                 await sleep(30000);
+//                 window.location.href = '/login';
+//             }
+//         } else {
+//             console.error('Failed to fetch user data');
+//             document.getElementById('userData').textContent = 'Failed to fetch user data';
+//         }
+//     } catch (error) {
+//         console.error('Error fetching user data:', error);
+//         document.getElementById('userData').textContent = 'Error fetching user data';
+//     }
+// }
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  }
 async function fetchUserData(accessToken) {
+    accessToken = getCookie('access_token');
+
     try {
+        console.log(accessToken);
+
         const response = await fetch('http://localhost:8000/api/user_data/', {
             method: 'GET',
             headers: {
@@ -26,8 +122,23 @@ async function fetchUserData(accessToken) {
             // You can update the UI here with user data
             document.getElementById('userData').textContent = JSON.stringify(userData, null, 2);
         } else if (response.status === 401) {
-            console.error('Unauthorized: Invalid or expired token');
-            document.getElementById('userData').textContent = 'Unauthorized: Invalid or expired token';
+            const refreshToken = getCookie("refresh_token");
+            console.log("hada refresh_token: ",refreshToken);
+        if (!refreshToken) {
+            console.log("ana hna!!");
+        const refreshResponse = await fetch("http://localhost:8000/token_refresh/", {
+          method: "POST",
+            headers: {
+          "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refresh: refreshToken }),
+        });
+
+      if (refreshResponse.ok) {
+        const data = await refreshResponse.json();
+        document.cookie = access_token=`${data.access}`; SameSite=None; Secure;
+      }
+    }
         } else {
             console.error('Failed to fetch user data');
             document.getElementById('userData').textContent = 'Failed to fetch user data';
@@ -83,7 +194,9 @@ async function get_content(template){
         if(response.ok){
             const data = await response.text();
             import(`./theme.js`).then(module => {
-                module.toggleTheme();
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                window.toggleTheme = module.toggleTheme;
             } ).catch(error => {
                 console.error('Error in importing the module:', error);
             } );
@@ -130,6 +243,13 @@ async function get_content(template){
                 
                 home_navbar.style.display = "block";
             }
+            if(template==="dashboard.html"){
+                import(`./rendringData.js`).then(module => {
+                    module.fetching_data();
+                }).catch(error => {
+                    console.error('Error in importing the module:', error);
+                } );
+            }
             document.title = css_file;
             if(template==="landing.html" || template==="login.html" || template==="signup.html"){
                 profile_content.style.display = "none";
@@ -154,6 +274,22 @@ async function get_content(template){
         content.innerHTML = `<h1>${error.message}</h1>`;
     }
 }
+//function to pop up a div
+function drop(wind){
+    wind.style.display = "none";
+}
+function pop_up(){
+    const popup = document.getElementById('concept-modal');
+    // const close = pop_up.querySelector('.close-btn');
+    popup.style.display = "flex";
+    const closeBtn = popup.querySelector(".close-btn");
+    closeBtn.addEventListener("click", () => {
+        popup.style.display = "none";
+    });
+}
+
+window.pop_up = pop_up;
+
 
 //function to change the css file
 

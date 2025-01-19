@@ -56,6 +56,7 @@ export function log42(){
             if (response.ok) {
                 // Extract the URL and redirect the user
                 const data = await response.json();
+                console.log(data )
                 if (data.url) {
                     
                     window.location.href = data.url; // Redirect to Intra42 authentication page

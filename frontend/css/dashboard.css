@@ -34,7 +34,7 @@
 
 .profile {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .usr {
@@ -152,6 +152,12 @@
 .game-mode {
     position: relative;
     width: 200px;
+}
+
+.profile-img{
+    border-radius: 50px;
+    width: 10vw;
+    height: 10vw;
 }
 
 .game-mode .mode-icon {

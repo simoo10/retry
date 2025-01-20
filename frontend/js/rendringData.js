@@ -66,3 +66,185 @@ export async function fetching_data(){
     }
     // return data;
 }
+
+function friendsRequest() {
+    document.getElementById('request-form').addEventListener('submit', async function (event) {
+        console.log('submit->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.');
+        // sleep(7000);
+        event.preventDefault();
+    
+        const username = document.getElementById('username').value;
+        console.log('------->',username);
+        if(!username){
+            document.getElementById('request-resp').textContent ='Please enter a username';
+            document.getElementById('request-resp').style.color="#f4000c";
+            return;
+        }    
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/?', {//kteb url dyal endpoint dyalk
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({username}),
+            });
+    
+            if (response.ok) {
+                const responseData = await response.json();
+                document.getElementById('request-resp').textContent ='Request send successfully to '+responseData.username;
+            } else {
+                const errorData = await response.json();
+                document.getElementById('request-resp').textContent = errorData.error;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('request-resp').textContent = 'Network error. Please try again.';
+        }
+    });
+}
+
+export function displayWindow(window){
+    const windows = document.getElementsByClassName('friends-windows');
+    if(!window)
+    {
+        window = 'online-list';
+    }
+    const my_window = document.getElementById(window);  
+    // console.log("---==",z);
+    for(let i=0; i<windows.length; i++){
+        console.log('d5elt ldisplay--!');
+        windows[i].style.display = 'none';
+    }
+    console.log(window);
+   // document.getElementById(window).style.display = 'block';
+    my_window.style.display = 'block';
+    if(window ==='add-friends'){
+        document.getElementsByClassName('lists')[0].style.backgroundColor = 'transparent';
+        document.getElementById('search-frds').style.display = 'none';
+    }
+    else{
+        console.log('here1');
+        document.getElementById('search-frds').style.display = 'block';
+        document.getElementsByClassName('lists')[0].style.backgroundColor = '#141622';
+    }
+    // if(window==='add-friends')
+    // {
+    //     // friendsRequest();
+    // }
+}
+window.displayWindow = displayWindow;
+
+let history_matchs=[
+    {
+        "id": 1,
+        "user": 1,
+        "opponent": 2,
+        "result": "win",
+        "date": "2021-09-19",
+        "user_goals": 5,
+        "opponent_goals": 9,
+    },
+    {
+        "id": 2,
+        "user": 1,
+        "opponent": 3,
+        "result": "lose",
+        "date": "2021-09-19",
+        "user_goals": 5,
+        "opponent_goals": 9,
+
+    },
+    {
+        "id": 3,
+        "user": 1,
+        "opponent": 4,
+        "result": "win",
+        "date": "2021-09-19",
+        "user_goals": 10,
+        "opponent_goals": 5,
+    },
+    {
+        "id": 4,
+        "user": 1,
+        "opponent": 5,
+        "result": "win",
+        "date": "2021-09-19",
+        "user_goals": 10,
+        "opponent_goals": 4,
+    },
+    {
+        "id": 5,
+        "user": 1,
+        "opponent": 6,
+        "result": "win",
+        "date": "2021-09-19",
+        "user_goals": 10,
+        "opponent_goals": 3,
+    },
+    {
+        "id": 6,
+        "user": 1,
+        "opponent": 7,
+        "result": "lose",
+        "date": "2021-09-19",
+        "user_goals": 5,
+        "opponent_goals": 9,
+    },
+    {
+        "id": 7,
+        "user": 1,
+        "opponent": 8,
+        "result": "win",
+        "date": "2021-09-19",
+        "user_goals": 10,
+        "opponent_goals": 3,
+    },
+
+];
+
+
+export function display_match_history()
+{
+    const history = document.getElementById("history-body"); 
+    history.innerHTML = '';
+    for(let i=0; i<history_matchs.length; i++)
+    {
+        let user = history_matchs[i].user;
+        let opponent = history_matchs[i].opponent;
+        let result = history_matchs[i].result;
+        // let oponent_result = history_matchs[i].result;
+        let oponent_result;
+        let date = history_matchs[i].date;
+        let user_goals = history_matchs[i].user_goals;
+        let opponent_goals = history_matchs[i].opponent_goals;
+        if(result === 'win'){
+            // result = 'Win';
+            oponent_result = 'lose';
+        }
+        else{
+            oponent_result = 'win';
+        }
+        history.innerHTML += `
+        <tr class="tr-style">
+            <td>${user}</td>
+            <td>${result}</td>
+            <td>${user_goals}</td>
+            <td rowspan="2">${date}</td>
+        </tr>
+        <tr class="tr-style">
+            <td>${opponent}</td>
+            <td>${oponent_result}</td>
+            <td>${opponent_goals}</td>
+        </tr>
+        `;
+        // const td = document.getElementsByTagName('td');
+        // td[i].style.backgroundColor = '#141622';
+        // td[i].style.color = '#fff';
+        
+    }
+        const td = document.getElementsByTagName('td');
+        for(let i=0; i<td.length; i++){
+            td[i].style.backgroundColor = '#141622';
+            td[i].style.color = '#fff';
+        }
+}

@@ -246,7 +246,16 @@ async function get_content(template){
             if(template==="dashboard.html"){
                 import(`./rendringData.js`).then(module => {
                     module.fetching_data();
+                    module.display_match_history();
                 }).catch(error => {
+                    console.error('Error in importing the module:', error);
+                } );
+            }
+            if(template==="friends.html"){
+                import(`./rendringData.js`).then(module => {
+                    module.displayWindow();
+                }
+                ).catch(error => {
                     console.error('Error in importing the module:', error);
                 } );
             }

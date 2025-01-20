@@ -237,9 +237,6 @@ export function display_match_history()
             <td>${opponent_goals}</td>
         </tr>
         `;
-        // const td = document.getElementsByTagName('td');
-        // td[i].style.backgroundColor = '#141622';
-        // td[i].style.color = '#fff';
         
     }
         const td = document.getElementsByTagName('td');

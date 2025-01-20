@@ -8,6 +8,7 @@ const routes = [
     {link:'/friends',template:'friends.html'},
     {link:'/leaderboard',template:'leaderboard.html'},
     {link:'/test' ,template:'test.html'},
+    {link:'/settings',template:'settings.html'},
 ];
 
 // function getCookie(name) {
@@ -251,6 +252,9 @@ async function get_content(template){
                     console.error('Error in importing the module:', error);
                 } );
             }
+            if(template==="settings.html"){
+                // uploadAvatar();
+            }
             if(template==="friends.html"){
                 import(`./rendringData.js`).then(module => {
                     module.displayWindow();
@@ -336,3 +340,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialRoute = window.location.pathname || "/landing";
     handling_navigation(initialRoute, false);
 });
+
+
+// document.getElementById('avatarUpload').addEventListener('change', function (event) {
+//     console.log('Avatar uploaded');
+//     const file = event.target.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = function (e) {
+//             document.getElementById('avatar').src = e.target.result;
+//         };
+//         reader.readAsDataURL(file);
+//     }
+// });
+
+function uploadAvatar() {
+    console.log('Uploading avatar...');
+    document.getElementById('avatarUpload').click();
+}

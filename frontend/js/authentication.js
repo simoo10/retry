@@ -1,40 +1,4 @@
-//42 authentication function for login
-
-// export function log42(){
-//     document.getElementById('log-42').addEventListener('click', async () => {
-//         console.log('Login with 42 button clicked');
-//         const urlParams = new URLSearchParams(window.location.search);
-//         const login = urlParams.get('login');
-//         const email = urlParams.get('email');
-//         console.log(`Logged in user: ${login}, Email: ${email}`);
-
-//         try {
-//             // Fetch the Intra42 authentication URL from the backend
-//             const response = await fetch('http://localhost:8000/api/login_with_42/', {
-//                 method: 'GET',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                 },
-//             });
-    
-//             if (response.ok) {
-//                 // Extract the URL and redirect the user
-//                 const data = await response.json();
-//                 if (data.url) {
-//                     window.location.href = data.url; // Redirect to Intra42 authentication page
-//                 } else {
-//                     console.error('URL not found in response');
-//                 }
-//                 return('ok');
-//             } else {
-//                 console.error('Failed to fetch authentication URL');
-//             }
-//         } catch (error) {
-//             console.error('Error during login:', error);
-//             return('ko');
-//         }
-//     });
-// }
+let log42Complete = false;
 
 export function log42(){
     document.getElementById('log-42').addEventListener('click', async () => {
@@ -58,18 +22,26 @@ export function log42(){
                 const data = await response.json();
                 console.log(data )
                 if (data.url) {
-                    
+                    log42Complete = true;
                     window.location.href = data.url; // Redirect to Intra42 authentication page
+                    
+                    
                 } else {
                     console.error('URL not found in response');
+                    return(false);
                 }
             } else {
                 console.error('Failed to fetch authentication URL');
+                return(false);
             }
         } catch (error) {
             console.error('Error during login:', error);
+            return(false);
         }
     });
+}
+export function isLog42Complete() {
+    return log42Complete;
 }
 
 
@@ -81,13 +53,16 @@ export function handleCallbackResponse() {
 
     if (accessToken && refreshToken) {
         console.log('Tokens retrieved:', { accessToken, refreshToken });
-
+        
         // Use the tokens to fetch user data
         fetchUserData(accessToken);
+        console.log('good!!!');
+        log42Complete = true;
+        // login_success= true;
     } else {
         console.error('No tokens found');
+        // login_success = false;
     }
-    
 }
 
 // Helper function to get cookies
@@ -111,15 +86,20 @@ export async function fetchUserData(accessToken) {
         if (response.ok) {
             const userData = await response.json();
             console.log('User data:', userData);
+            // login_success= true;
+            return (true);
          // Update the UI with user data
         } else if (response.status === 401) {
             console.error('Unauthorized: Invalid or expired token');
+            login_success= false;
             // Display user data on the page (e.g., login, email, etc.)
         } else {
             console.error('Failed to fetch user data');
+            return (false);
         }
     } catch (error) {
         console.error('Error fetching user data:', error);
+        return (false);
     }
 }
 
@@ -188,9 +168,11 @@ export function simplelog() {
                 // window.location.href = login.html;
                 import(`./main.js`).then(module => {
                     module.handling_navigation('/login');
+                    return (true);
                 }
                 ).catch(error => {
                     console.error('Error in importing the module:', error);
+                    return (false);
                 });
                 // return ('ok');
                 // Redirect to the login page
@@ -201,10 +183,12 @@ export function simplelog() {
                 console.log('Signup failed:3', response.statusText);
                 alert("Signup failed: " + response.statusText);
                 return ('ko');
+                return(false);
                 // document.getElementById('responseMessage').textContent = "Signup failed: " + response.statusText;
             }
         } catch (error) {
             console.error('Error:4', error);
+            return(false);
             // document.getElementById('responseMessage').textContent = "Network error or server is down";
         }
     });
@@ -253,3 +237,5 @@ export function login() {
         }
     });
 }
+
+export {log42Complete};

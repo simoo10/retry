@@ -1,4 +1,9 @@
 //all the routes are defined here
+
+let login_success = false;
+import { isLog42Complete } from "./authentication.js";
+import { log42Complete } from "./authentication.js";
+
 const routes = [
     {link:'/',template:'landing.html'},
     {link:'/landing',template:'landing.html'},
@@ -170,25 +175,48 @@ const navbar = document.getElementById('landing-navbar');
 const home_navbar = document.getElementById('home-navbar');
 //function to handle navigation
 
-export function handling_navigation(route,updateHistory = true){
-    console.log("Route: ",route);
-    const exact_route = routes.find(r => r.link === route);
-    if(exact_route)
-    {
+export async function handling_navigation(route, updateHistory = true) {
+    const parsedUrl = new URL(window.location.href);
+    const params = new URLSearchParams(parsedUrl.search);
+    const code = params.get("code");
+    //http://localhost:8000/api/intra42callback/?code=${code}
+    if (code) {
+        // window.location.href = `http://localhost:8000/api/intra42callback/?code=${code}`;
+        try {
+            const response = await fetch(`http://localhost:8000/api/intra42callback/?code=${code}`);
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Data: ", data);
+                login_success = true;
+                console.log("Login Success: ", login_success);
+                // handling_navigation('/dashboard');
+            } else {
+                throw new Error("Failed to fetch user data");
+            }
+        }
+        catch (error) {
+            console.error("Error !!!!!!!!!!!!!!!!!: ", error);
+        }
+    }
+
+    const exact_route = routes.find((r) => r.link === route);
+    if (exact_route) {
         get_content(exact_route.template);
         if (updateHistory) {
             history.pushState({ route }, "", route);
         }
-    }
-    else{
-        get_content('404.html');
-        history.pushState({route},"",route);
+    } else {
+        get_content("404.html");
+        history.pushState({ route }, "", route);
     }
 }
+
 
 //function to get the content of the template
 
 async function get_content(template){
+
+    console.log("Template: ",template,"login: ",login_success);
     try{
         console.log("--->",template);
         const response = await fetch(`views/${template}`);
@@ -201,6 +229,7 @@ async function get_content(template){
             } ).catch(error => {
                 console.error('Error in importing the module:', error);
             } );
+            
             const css_file = template.split('.')[0];
             if(css_link){
                document.head.removeChild(css_link); 
@@ -209,8 +238,6 @@ async function get_content(template){
             css_link.rel = 'stylesheet';
             css_link.href = `css/${css_file}.css`;
             document.head.appendChild(css_link);
-            // change_css(`css/${css_file}.css`);
-            // console.log("CSS File: ",css_file);
             console.log("CSS Link: ",css_link);
             if(template==="login.html" || template==="signup.html")
             {
@@ -221,6 +248,7 @@ async function get_content(template){
                     module.log42();
                     module.login();
                     module.handleCallbackResponse();
+                    console.log("Login 5assha t5dem!!------------------------------>",login_success);
                 }).catch(error => {
                     console.error('Error in importing the module:', error);
                 } );
@@ -245,6 +273,12 @@ async function get_content(template){
                 home_navbar.style.display = "block";
             }
             if(template==="dashboard.html"){
+                // if(!log42Complete){
+                //     console.log("!!!!!!!!!!!!!!!!!!!!!");
+                //     handling_navigation('/login');
+                //     return;
+                // }
+                console.log("Dashboard 5assha t5dem!!");
                 import(`./rendringData.js`).then(module => {
                     module.fetching_data();
                     module.display_match_history();
@@ -253,7 +287,12 @@ async function get_content(template){
                 } );
             }
             if(template==="settings.html"){
-                // uploadAvatar();
+                import(`./settings.js`).then(module => {
+                    module.uploadAvatar();
+                    module.send_editing_data();
+                }).catch(error => {
+                    console.error('Error in importing the module:', error);
+                } );
             }
             if(template==="friends.html"){
                 import(`./rendringData.js`).then(module => {
@@ -342,19 +381,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// document.getElementById('avatarUpload').addEventListener('change', function (event) {
-//     console.log('Avatar uploaded');
-//     const file = event.target.files[0];
-//     if (file) {
-//         const reader = new FileReader();
-//         reader.onload = function (e) {
-//             document.getElementById('avatar').src = e.target.result;
-//         };
-//         reader.readAsDataURL(file);
-//     }
-// });
-
-function uploadAvatar() {
-    console.log('Uploading avatar...');
-    document.getElementById('avatarUpload').click();
-}

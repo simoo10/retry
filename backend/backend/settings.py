@@ -138,9 +138,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-OAUTH_42_CLIENT_ID = 'u-s4t2ud-0ac40e64887c605f3671ea4a71afb97e41aca6cc87fb58aae9ae0b0acb30b59a'
-OAUTH_42_CLIENT_SECRET = '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'
-OAUTH_42_REDIRECT_URI = 'http://localhost:8000/api/intra42callback/'
+OAUTH_42_CLIENT_ID = 'u-s4t2ud-748193493cc7a54fbe87da840701e2bd487f8af5e88c661e2c9f2a3dd66d1b90'
+OAUTH_42_CLIENT_SECRET = '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'
+OAUTH_42_REDIRECT_URI = 'http://localhost:8080/dashboard'
 OAUTH_42_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_42_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
 OAUTH_42_API_BASE_URL = 'https://api.intra.42.fr/v2'

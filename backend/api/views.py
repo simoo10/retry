@@ -108,7 +108,7 @@ class loginwith42(APIView):
         client_id = settings.OAUTH_42_CLIENT_ID
 
         # Step 2: Define the Redirect URI
-        redirect_uri = "http://localhost:8000/api/intra42callback/"
+        redirect_uri = "http://localhost:8080/dashboard"
 
         # Step 3: Generate a random state string
         state = str(uuid.uuid4())  # Unique identifier for CSRF protection
@@ -160,7 +160,7 @@ class Intra42Callback(APIView):
     def get(self, request):
         print("Debug: Callback handler reached.")
         code = request.GET.get('code')
-        #print("code = |", code, "|")
+        print("code = |", code, "|")
         try:
             # Exchange the code for tokens
             token_url = "https://api.intra.42.fr/oauth/token"
@@ -201,22 +201,41 @@ class Intra42Callback(APIView):
             #         #"refresh_token": tokens.get('refresh_token', ''),
             #     },
             # )
-            user = Intra42User(intra_id=user_data['id'], login=user_data['login'],first_name=user_data['first_name'],last_name=user_data['last_name'],email=user_data['email'],image=user_data['image'])#picture=picture
-            user.save()
-            refresh = RefreshToken.for_user(user)
+            user = Intra42User.objects.filter(intra_id=user_data['id'])
+            print('\n\n', user, '\n\n')
+            if user:
+                refresh = RefreshToken.for_user(user)
 
-            print("User saved:", refresh.access_token)
-            print("User saved:", str(refresh))
-            responsee = JsonResponse({
-            'message': 'Data received successfully',
-            'access_token': str(refresh.access_token),
-            'refresh_token': str(refresh),
-            'url' : "http://localhost:8080/dashboard"
-            })
+                print("User saved:", refresh.access_token)
+                print("User saved:", str(refresh))
+                responsee = JsonResponse({
+                'message': 'Data received successfully',
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'url' : "http://localhost:8080/dashboard"
+                })
 
-            set_secure_cookie(responsee, {'access': str(refresh.access_token), 'refresh': refresh})
-            print('\n\n\n', responsee, '\n\n\n')
-            return responsee
+                set_secure_cookie(responsee, {'access': str(refresh.access_token), 'refresh': refresh})
+                print('\n\n\n', responsee, '\n\n\n')
+                return responsee
+
+            else:
+                user = Intra42User(intra_id=user_data['id'], login=user_data['login'],first_name=user_data['first_name'],last_name=user_data['last_name'],email=user_data['email'],image=user_data['image'])#picture=picture
+                user.save()
+                refresh = RefreshToken.for_user(user)
+
+                print("User saved:", refresh.access_token)
+                print("User saved:", str(refresh))
+                responsee = JsonResponse({
+                'message': 'Data received successfully',
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'url' : "http://localhost:8080/dashboard"
+                })
+
+                set_secure_cookie(responsee, {'access': str(refresh.access_token), 'refresh': refresh})
+                print('\n\n\n', responsee, '\n\n\n')
+                return responsee
 
         except requests.RequestException as err:
             return JsonResponse({"error": str(err)}, status=500)

@@ -30,6 +30,8 @@ body {
 #sidebarMenu {
     background-color: var(--background-color2);
     height: 100%;
+    width: 340px;
+    border-radius: 10px;
     overflow-y: auto;
     overflow-x: auto;
 }
@@ -56,7 +58,7 @@ body {
     content: '';
     display: block;
     width: 80%; 
-    height: 3px; 
+    height: 5px; 
     background-color: rgb(98, 89, 89);
     position: absolute; 
     left: 8%;
@@ -75,9 +77,10 @@ body {
 }
 
 #menu {
-    margin-top: 20px;
-    margin-left: 4vw;
-    font-size: 25px;
+    margin-top: 50px;
+    margin-left: 2.5vw;
+    font-size: 22px;
+    font-weight: bold;
     color: #5356FB;
     font-family: 'Inter', sans-serif;
 }
@@ -89,15 +92,19 @@ body {
 }
 
 .sidebar-content {
-    font-size: 20px;
-    margin-left: 3vw;
+    font-size: 18px;
+    margin-left: 2vw;
     text-decoration: none;
+    font-weight: bold;
     font-family: 'Inter', sans-serif;
     color: #A4B1CD;
 }
-
+.sidebar-content:hover {
+    color: #5356FB;
+    cursor: pointer;
+}
 li {
-    margin-top: 25px;
+    margin-top: 20px;
 }
 
 #settings {
@@ -135,7 +142,7 @@ li {
     border-radius: 50px;
     border-color: #F338F7;
     height: 60px;
-    width: 30vw;
+    width: 350px;
     color: var(--text-color);
 }
 

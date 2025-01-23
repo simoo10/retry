@@ -13,6 +13,7 @@
 
 #dash-title {
     font-size: 45px;
+    font-weight: bold;
     font-family: 'Baloo Da', sans-serif;
     color: var(--text-color);
     margin-top: 20px;
@@ -40,10 +41,11 @@
 .usr {
     display: flex;
     flex-direction: column;
+    margin-top: 25px;
 }
 
 .username {
-    font-size: 30px;
+    font-size: 32px;
     font-family: 'Inter', sans-serif;
     color: #FFFFFF;
     margin-left: 15px;
@@ -58,7 +60,7 @@
 }
 
 .winning-rate {
-    border: 2px solid #FFFFFF;
+    border: 2px solid #c60000;
     width: max-content;
     background-color: #171820;
 }

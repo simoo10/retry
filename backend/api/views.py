@@ -245,14 +245,13 @@ def set_secure_cookie(response, param):
         'access_token',
         str(param['access']),
         secure=True,
-        samesite='None'
+        # samesite='None'
     )
     response.set_cookie(
         'refresh_token',
         str(param['refresh']),
-        
         secure=True,
-        samesite='None'
+        # samesite='None'
     )
     return response
 

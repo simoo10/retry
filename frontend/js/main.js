@@ -187,11 +187,10 @@ export async function handling_navigation(route, updateHistory = true) {
             if (response.ok) {
                 const data = await response.json();
                 console.log("Data: ", data);
-                login_success = true;
-                console.log("Login Success: ", login_success);
                 // handling_navigation('/dashboard');
             } else {
                 throw new Error("Failed to fetch user data");
+                handling_navigation('/login');
             }
         }
         catch (error) {

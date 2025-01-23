@@ -81,7 +81,7 @@ function friendsRequest() {
             return;
         }    
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/?', {//kteb url dyal endpoint dyalk
+            const response = await fetch('http://127.0.0.1:8000/api/', {//kteb url dyal endpoint dyalk
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

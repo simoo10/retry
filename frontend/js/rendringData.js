@@ -229,7 +229,7 @@ export function display_match_history()
             <td>${user}</td>
             <td>${result}</td>
             <td>${user_goals}</td>
-            <td rowspan="2">${date}</td>
+            <td rowspan="2" class="date-style">${date}</td>
         </tr>
         <tr class="tr-style">
             <td>${opponent}</td>
@@ -241,7 +241,22 @@ export function display_match_history()
     }
         const td = document.getElementsByTagName('td');
         for(let i=0; i<td.length; i++){
-            td[i].style.backgroundColor = '#141622';
             td[i].style.color = '#fff';
+            td[i].style.border = 'none';
+        }
+        const tr = document.getElementsByClassName('tr-style');
+        for(let i=0; i<tr.length; i++){
+            if(i%2 === 0){
+            tr[i].style.border ='none';
+            }
+            else{
+                tr[i].style.borderBottom ='2px solid rgb(218, 215, 215)';
+            }
+        }
+        const date_style = document.getElementsByClassName('date-style');
+        for(let i=0; i<date_style.length; i++){
+            // date_style[i].style.alignItems = 'center';
+            // date_style[i].style.justifyContent = 'center';
+           date_style[i].style.alignContent = 'center';
         }
 }

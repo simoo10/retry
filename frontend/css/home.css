@@ -30,7 +30,7 @@ body {
 #sidebarMenu {
     background-color: var(--background-color2);
     height: 100vh;
-    width: 13vw;
+    /* width: 13vw; */
     border-radius: 10px;
     overflow-y: auto;
     overflow-x: auto;
@@ -103,6 +103,7 @@ body {
     color: #5356FB;
     cursor: pointer;
 }
+
 li {
     margin-top: 20px;
 }
@@ -124,7 +125,7 @@ li {
     width: max-content;
     border-radius: 50px;
     margin-top: 30px;
-    margin-left: 70px;
+    margin-left: 2vw;
 }
 
 #navbar-2 {
@@ -216,7 +217,7 @@ main{
 
 
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .sidebar {
         display: none;
     }
@@ -237,7 +238,7 @@ main{
     }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1200px) {
     #toggle-button {
         display: none;
     }

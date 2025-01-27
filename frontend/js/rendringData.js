@@ -1,15 +1,31 @@
 //Function to render data of profile in the dashboard
-function getCookie(name) {
+export function getCookie(name) {
+    // console.log("Trying to get cookie:", name);  // Log the cookie name you're looking for
     const value = `; ${document.cookie}`;
+    // console.log("document.cookie:", document.cookie);  // Log the entire cookies string to check its contents
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
+    // console.log("split result:", parts);  // Log the result of splitting by the cookie name
+    if (parts.length === 2) {
+        const cookieValue = parts.pop().split(";").shift();
+        // console.log("Found cookie:", cookieValue);  // Log the value of the cookie if found
+        return cookieValue;
+    }
+    // console.log("Cookie not found");
     return null;
-  }
+}
+
 function render_profile(data){
-    const jsonString = data.image.replace(/'/g, '"');
-    const imageData = JSON.parse(jsonString);
-    console.log(imageData);
-    const profile_img = imageData.link;
+    console.log(data);
+    // const jsonString = data.image.replace(/'/g, '"');
+    // const imageData = JSON.parse(jsonString);
+    // console.log(imageData);
+    let profile_img;
+    if(data.image){
+        profile_img = data.image;
+    }
+    else{
+        profile_img = "images/avatar.png";
+    }
     const profile = document.getElementsByClassName('profile')[0];
     profile.innerHTML = `
             <div class="usr">
@@ -38,10 +54,9 @@ function render_profile(data){
     user_info.style.flexDirection = 'column';
     user_info.style.marginTop = '20px';
     username_style.style.alignItems = 'flex-start';
-
-    
-
 }
+
+
 export async function fetching_data(){
     const access_token = getCookie('access_token');
     try{
@@ -259,4 +274,29 @@ export function display_match_history()
             // date_style[i].style.justifyContent = 'center';
            date_style[i].style.alignContent = 'center';
         }
+}
+
+function setWinningRate(percentage) {
+    const progressArc = document.getElementById('progress-arc');
+    const percentageText = document.getElementById('percentage-text');
+
+    // Clamp the percentage between 0 and 100
+    const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+
+    // Calculate the stroke-dashoffset for the arc
+    const totalLength = 283; // Circumference of the arc
+    const offset = totalLength - (clampedPercentage / 100) * totalLength;
+
+    // Update the progress arc and percentage text
+    progressArc.style.strokeDashoffset = offset;
+    percentageText.textContent = `${clampedPercentage}%`;
+    percentageText.style.color = "rgb(255,255,255)";
+    percentageText.style.fontSize="28px";
+    percentageText.style.marginTop = "-60px";
+    percentageText.style.fontWeight = "bolder";
+}
+
+export function display_winning_rate()
+{
+    setWinningRate(80);
 }

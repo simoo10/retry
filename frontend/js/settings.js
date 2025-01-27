@@ -1,8 +1,10 @@
 export function uploadAvatar()
 {
-    document.getElementById("avatarUpload").click();
+    
+    document.getElementById("avatarUpload").click();console.log("ghayhrblya3!!!");
 }
 document.getElementById('avatarUpload').addEventListener('change', function (event) {
+    console.log("ghayhrblya!!!");
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -17,6 +19,7 @@ window.uploadAvatar = uploadAvatar;
 
 export async function send_editing_data()
 {
+    console.log("ghayhrblya2!!!");
     document.getElementById("profile-form").addEventListener('submit', async function (event) {
         event.preventDefault();
         const username = document.getElementById('username').value;
@@ -41,5 +44,28 @@ export async function send_editing_data()
             data.password = password
         }
         console.log(data);
+        try{
+            const response = await fetch('http://127.0.0.1:8000/api/',{
+                method:'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(data),
+            });
+            if(response.ok){
+                const responseData = await response.json();
+                document.getElementById('update-resp').textContent ='Request send successfully to '+responseData.username;
+            }
+            else{
+                const errorData = await response.json();
+                document.getElementById('update-resp').textContent = errorData.error;
+            }
+        }
+        catch(error){
+            console.error('Error:', error);
+            document.getElementById('update-resp').textContent = 'Network error. Please try again.';
+        }
     });
 }
+

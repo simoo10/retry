@@ -233,6 +233,12 @@
         background-color: #f1f1f1;
         color: #141622;
     }
+    #dash-title{
+        font-size: 30px;
+    }
+    .username{
+        font-size: 20px;
+    }
 }
 
 @media (min-width: 1200px) {

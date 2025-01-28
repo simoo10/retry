@@ -368,7 +368,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialRoute = window.location.pathname || "/landing";
     handling_navigation(initialRoute, false);
 });
+const toggleButton = document.getElementById("toggle-button");
+const sidebarMenu = document.getElementById("sidebarMenu");
 
+// Toggle sidebar visibility
+toggleButton.addEventListener("click", (e) => {
+  sidebarMenu.classList.toggle("show");
+  // Stop event propagation
+  e.stopPropagation();
+});
+
+// Hide sidebar when clicking outside
+document.addEventListener("click", (e) => {
+  // Check if the click is outside both the sidebar and the toggle button
+  if (!sidebarMenu.contains(e.target) && !toggleButton.contains(e.target)) {
+    sidebarMenu.classList.remove("show");
+  }
+});
+
+// Prevent sidebar clicks from hiding it
+sidebarMenu.addEventListener("click", (e) => {
+  // Allow clicks on links to work
+  if (e.target.tagName === "A") return; // Allow navigation
+  e.stopPropagation();
+});
 
 export {username};
 

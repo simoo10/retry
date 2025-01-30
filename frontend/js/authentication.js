@@ -237,6 +237,12 @@ export function login() {
                 });
             } else {
                 const errorData = await response.json();
+                const wrongCredentials = document.getElementById('wrong-credentials');
+                wrongCredentials.textContent = "Wrong username or password";
+                wrongCredentials.style.color = 'red';
+                wrongCredentials.style.display = 'flex';
+                wrongCredentials.style.justifyContent = 'center';
+                wrongCredentials.style.textAlign = 'center';
                 console.error('1-Error:', errorData.error);
                 // document.getElementById('errorMessage').textContent = errorData.error;
             }
@@ -256,7 +262,7 @@ export async function logout() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${accessToken}`
+                    "Authorization": `Bearer ${access_token}`
                 },
             });
             if(resp.ok)

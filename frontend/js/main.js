@@ -268,6 +268,7 @@ export async function get_content(template){
                     import(`./settings.js`).then(module => {
                         // module.uploadAvatar();
                         module.send_editing_data();
+                        module.get_data();
                     }).catch(error => {
                         console.error('Error in importing the module:', error);
                     } );
@@ -319,6 +320,7 @@ export async function get_content(template){
 function drop(wind){
     wind.style.display = "none";
 }
+
 function pop_up(){
     const popup = document.getElementById('concept-modal');
     // const close = pop_up.querySelector('.close-btn');

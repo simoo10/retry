@@ -25,6 +25,7 @@ function render_profile(data){
     }
     else{
         profile_img = "images/avatar.png";
+        data.image = profile_img;
     }
     const profile = document.getElementsByClassName('profile')[0];
     profile.innerHTML = `
@@ -70,7 +71,7 @@ export async function fetching_data(){
         if(response.ok){
             const data = await response.json();
             render_profile(data);
-            return;
+            // return(data);
         }
         else{
             console.error('Failed to fetch data');
@@ -79,7 +80,6 @@ export async function fetching_data(){
     catch(error){
         console.error('Error fetching data:', error);
     }
-    // return data;
 }
 
 function friendsRequest() {

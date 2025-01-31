@@ -78,6 +78,53 @@ body{
 
 
 }
+.ball {
+    position: absolute;
+    width: 1.5vw;
+    height: 1.5vw;
+    background-color: white;
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+    left: 50%; 
+    top: 20%; 
+    transform: translate(50%, -50%); 
+  }
+  
+  
+  @keyframes bounce {
+    from {
+      transform: translateX(-20vw);
+    }
+    to {
+      transform: translateX(20vw);
+    }
+  }
+  
+  .pong-table {
+    width: 100%;
+    height: 35vh;
+    object-fit: cover;
+    position: absolute;
+    bottom: 0;
+    background: transparent;
+  }
+  
+  .paddle-left,
+  .paddle-right {
+    width: 1vw; 
+    height: 20vh; 
+    background: #411356;
+    position: absolute;
+  }
+  
+  .paddle-left {
+    left: 2vw; 
+  }
+  
+  .paddle-right {
+    right: 2vw; 
+  }
+
 
 /*--------------------------right side css*----------------------------*/
 

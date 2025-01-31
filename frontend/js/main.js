@@ -59,6 +59,7 @@ async function fetchUserData(accessToken) {
         });
 
       if (refreshResponse.ok) {
+        console.log("refreshResponse: ",refreshResponse);
         const data = await refreshResponse.json();
         document.cookie = access_token=`${data.access}`; SameSite=None; Secure;
       }
@@ -107,6 +108,8 @@ export async function handling_navigation(route, updateHistory = true) {
             const response = await fetch(`http://localhost:8000/api/intra42callback/?code=${code}`);
             if (response.ok) {
                 const data = await response.json();
+                document.cookie = `access_token=${data.access_token}; path=/; Secure`;
+                document.cookie = `refersh_token=${data.refresh_token}; path=/; Secure`;
                 console.log("Data: ", data);
                 // handling_navigation('/dashboard');
             } else {
@@ -276,12 +279,20 @@ export async function get_content(template){
                 if(template==="friends.html"){
                     import(`./rendringData.js`).then(module => {
                         module.displayWindow();
+                        module.friendsRequest();
                     }
                 ).catch(error => {
                     console.error('Error in importing the module:', error);
                 } );
             }
             if(template==="landing.html" || template==="login.html" || template==="signup.html"){
+                const links = document.querySelectorAll('link[rel="stylesheet"]');
+    
+                links.forEach(link => {
+                if (link.getAttribute('href') === 'css/home.css') {
+                link.remove();
+                    }
+                });
                 document.title = css_file;
                 profile_content.style.display = "none";
                 content.style.display = "block";

@@ -254,7 +254,7 @@ export function login() {
 }
 
 export async function logout() {
-    
+    const access_token = getCookie('access_token');
     document.getElementById('logout-btn').addEventListener('click', async () => {
         console.log("han hna--> ");
         try{

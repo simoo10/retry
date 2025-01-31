@@ -6,10 +6,10 @@
     margin-bottom: 50px;
 }
 .profile-update {
-    display: flex;
+    display:flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    margin-left: 10vw;
     margin-top: 15vh;
 }
 #avatar{
@@ -27,7 +27,7 @@ label{
     font-family: 'Istok Bold', sans-serif;
 }
 input{
-    width: 30vw;
+    width: 22vw;
     height: 50px;
     font-size: 15px;
     margin-bottom: 40px;
@@ -39,7 +39,7 @@ input{
     border-radius: 20px;
 }
 #photo-upd{
-    width: 20vw;
+    width: 13.2vw;
     height: 60px;
     font-size: 20px;
     margin-left: 6vw;
@@ -52,12 +52,17 @@ input{
     border-radius: 20px;
 }
 #save-btn{
-    width: 25vw;
+    width: 20vw;
     height: 70px;
     font-size: 20px;
-    margin-left: 8vw;
-    margin-top: 40px;
+    margin-left: 6vw;
     background-color: #16a060;
     color: #ffffff;
     border-radius: 80px;
+}
+
+@media (max-width:900px) {
+    input{
+        width: 200px;
+    }
 }

@@ -57,16 +57,16 @@ document.getElementById('avatarUpload').addEventListener('change', function (eve
     }
 });
 
-function render_data()
-{
-    if(data_user.image){
-    document.getElementById('avatar').src = data_user.image;
-    }
-    else{
-        document.getElementById('avatar').src = "images/avatar.png";
-    }
-}
-render_data();
+// function render_data()
+// {
+//     if(data_user.image){
+//     document.getElementById('avatar').src = data_user.image;
+//     }
+//     else{
+//         document.getElementById('avatar').src = "images/avatar.png";
+//     }
+// }
+// render_data();
 
 
 window.uploadAvatar = uploadAvatar;

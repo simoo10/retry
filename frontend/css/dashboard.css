@@ -139,7 +139,7 @@
 
 }
 .main-btn {
-    background-color: #868686;
+    background-color: #868686; /* Default solid color */
     border: none;
     font-family: 'Inter', sans-serif;
     font-size: 20px;
@@ -149,10 +149,29 @@
     margin-top: 20px;
     width: 13vw;
     height: 50px;
+    cursor: pointer;
+    transition: background 0.5s ease-in-out;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Apply the gradient effect on hover */
 .main-btn:hover {
-    background-color: #5356FB;
+    background: linear-gradient(75deg, #F338F7 25%, #5B54FA 95%);
+    background-size: 300% 100%;
+    animation: gradientMove 0.5s infinite linear;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .dashtable {

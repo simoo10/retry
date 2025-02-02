@@ -1,7 +1,10 @@
-//all the routes are defined here
-import { getCookie } from "./rendringData.js"
+///all the routes are defined here
+import { fetching_data, getCookie } from "./rendringData.js"
+import { combinedChat, check_expiration } from "../game/js/setup2.js";
+
 
 let login_success = false;
+// const combinedChat = window.combinedChat;
 
 const routes = [
     {link:'/',template:'landing.html'},
@@ -50,16 +53,15 @@ async function fetchUserData(accessToken) {
             console.log("hada refresh_token: ",refreshToken);
         if (!refreshToken) {
             console.log("ana hna!!");
-        const refreshResponse = await fetch("http://localhost:8000/token_refresh/", {
+        const refreshResponse = await fetch("http://localhost:8000/api/token_refresh/", {
           method: "POST",
             headers: {
-          "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify({ refresh: refreshToken }),
         });
 
       if (refreshResponse.ok) {
-        console.log("refreshResponse: ",refreshResponse);
         const data = await refreshResponse.json();
         document.cookie = access_token=`${data.access}`; SameSite=None; Secure;
       }
@@ -93,7 +95,8 @@ const profile_content = document.getElementById('profiles-content');
 let css_link = null;
 const navbar = document.getElementById('landing-navbar');
 const home_navbar = document.getElementById('home-navbar');
-let username = "";
+const chat_content = document.getElementById('chat-container');
+export let username = "";
 //function to handle navigation
 
 export async function handling_navigation(route, updateHistory = true) {
@@ -108,9 +111,9 @@ export async function handling_navigation(route, updateHistory = true) {
             const response = await fetch(`http://localhost:8000/api/intra42callback/?code=${code}`);
             if (response.ok) {
                 const data = await response.json();
-                document.cookie = `access_token=${data.access_token}; path=/; Secure`;
-                document.cookie = `refersh_token=${data.refresh_token}; path=/; Secure`;
                 console.log("Data: ", data);
+                document.cookie = `access_token=${data.access_token}; SameSite=None; Secure`;
+                document.cookie = `refresh_token=${data.refresh_token}; SameSite=None; Secure`;
                 // handling_navigation('/dashboard');
             } else {
                 throw new Error("Failed to fetch user data");
@@ -133,32 +136,15 @@ export async function handling_navigation(route, updateHistory = true) {
 
         console.log("Access Token: ", access_token);
 
-        try{
-            const response = await fetch('http://localhost:8000/api/user_data/', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-            if(response.ok){
-                const responseData = await response.json();
-                // const data = await response.json();
-                console.log ("user is loged in :): ", responseData);
-
-                if (route == '/login' || route == '/signup' )
-                    return (handling_navigation('/dashboard'));
-                username = responseData.login;
-                
-            }
-            else {
-                console.error('Failed to fetch data, redirecting to login page');
-                if (route != '/login' && route != '/signup' )
-                    return (handling_navigation('/login'));
-            }
+        try {
+            if (await check_expiration (route) && (route == '/login' || route == '/signup' ))
+                return (handling_navigation('/dashboard'));
+            // if (route == '/login' || route == '/signup' )
+            //     return (handling_navigation('/dashboard'));
+            // i need here to throw an error which specify it needs to go to dashboard when already logged
         }
-        catch(error){
-            console.error('Error fetching data redirecting to login page:', error);
+        catch(error) {
+            console.error('2--Error fetching data redirecting to login page:', error);
             if (route != '/login' && route != '/signup' )
                 return (handling_navigation('/login'));
         }
@@ -174,8 +160,29 @@ export async function handling_navigation(route, updateHistory = true) {
         history.pushState({ route }, "", route);
     }
 }
+export let stats_data="ff";
+export let img_prof = "";
+export async function matchs_stats(){
+    try {
+        const response = await fetch(`http://localhost:8000/game/api/player-stats/${username}/`);
+        console.log("Username: ", username);
+        console.log("Response: ", response);
+        console.log("Response: ", response.status);
+        // Check if the response is OK (status code 200-299)
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-
+        const data = await response.json();
+        // stats_data == data;
+        // console.log("111111Stats1111111: ",stats_data);
+        console.log('Player stats:', data.stats);
+        return(data);
+    } catch (error) {
+        console.error('Error loading player stats:', error);
+    }
+}
 //function to get the content of the template
 import { log42, login, handleCallbackResponse } from "./authentication.js";
 
@@ -252,11 +259,18 @@ export async function get_content(template){
                     //     handling_navigation('/login');
                     //     return;
                     // }
+                    stats_data = await matchs_stats();
+                    
+                    // console.log("Stat@@@@@@@@@@@@@@@: ",stats_data);
                     console.log("Dashboard 5assha t5dem!!");
                     import(`./rendringData.js`).then(module => {
                         module.fetching_data();
+                        console.log("Image:------------------------- ",img_prof);
                         module.display_match_history();
-                        module.display_winning_rate();
+                        (async () => {
+                            await fetching_data(); // Wait for `fetchProfileImage()` to complete
+                            module.display_winning_rate();         // Call only after `image_pr` is set
+                        })();
                     }).catch(error => {
                         console.error('Error in importing the module:', error);
                     } );
@@ -344,7 +358,9 @@ function pop_up(){
 
 window.pop_up = pop_up;
 
-
+export function setUsername(newUsername) {
+    username = newUsername;
+}
 //function to change the css file
 
 function change_css(path) {
@@ -406,5 +422,6 @@ sidebarMenu.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
-export {username};
+
+// export {username};
 

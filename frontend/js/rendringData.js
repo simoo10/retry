@@ -1,4 +1,8 @@
+
+import { stats_data, username } from "./main.js";
 //Function to render data of profile in the dashboard
+export let image_pr="../images/avatar.png";
+
 export function getCookie(name) {
     // console.log("Trying to get cookie:", name);  // Log the cookie name you're looking for
     const value = `; ${document.cookie}`;
@@ -13,15 +17,23 @@ export function getCookie(name) {
     // console.log("Cookie not found");
     return null;
 }
-
+import { matchs_stats } from "./main.js";
 function render_profile(data){
     console.log(data);
     // const jsonString = data.image.replace(/'/g, '"');
     // const imageData = JSON.parse(jsonString);
     // console.log(imageData);
     let profile_img;
+    // console.log('==>?,',data);
     if(data.image){
-        profile_img = data.image;
+        // console.log('image:------>');
+        const jsonString = data.image.replace(/'/g, '"');
+        const imageData = JSON.parse(jsonString);
+        console.log(imageData);
+         profile_img = imageData.link;
+        //  image_pr = profile_img;
+         
+        // profile_img = data.image;
     }
     else{
         profile_img = "images/avatar.png";
@@ -55,6 +67,7 @@ function render_profile(data){
     user_info.style.flexDirection = 'column';
     user_info.style.marginTop = '20px';
     username_style.style.alignItems = 'flex-start';
+    return (profile_img);
 }
 
 
@@ -70,8 +83,9 @@ export async function fetching_data(){
         });
         if(response.ok){
             const data = await response.json();
-            render_profile(data);
-            // return(data);
+            console.log('!!!',render_profile(data));
+            image_pr = render_profile(data);
+            return(image_pr);
         }
         else{
             console.error('Failed to fetch data');
@@ -83,7 +97,7 @@ export async function fetching_data(){
 }
 
 export async function friendsRequest() {
-    
+    const access_token = getCookie('access_token');
     document.getElementById('request-form').addEventListener('submit', async function (event) {
         // sleep(7000);
         event.preventDefault();
@@ -100,6 +114,7 @@ export async function friendsRequest() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access_token}`,
                 },
                 body: JSON.stringify({username}),
             });
@@ -220,19 +235,29 @@ let history_matchs=[
 
 export function display_match_history()
 {
+    // const stats = matchs_stats();
+    console.log('image_pr""""""""""""""""""":',image_pr);
+
+    console.log('stats+++++++++++++++=:',stats_data);
     const history = document.getElementById("history-body"); 
     history.innerHTML = '';
-    for(let i=0; i<history_matchs.length; i++)
+    for(let i=0; i<stats_data.stats.total_games; i++)
     {
-        let user = history_matchs[i].user;
-        let opponent = history_matchs[i].opponent;
-        let result = history_matchs[i].result;
+        let user = username;
+        let result;
+        let opponent = stats_data.recent_matches[i].opponent;
+        if(stats_data.recent_matches[i].won===true){
+            result = 'Win';
+        }
+        else{
+            result = 'Lose';
+        }
         // let oponent_result = history_matchs[i].result;
         let oponent_result;
-        let date = history_matchs[i].date;
-        let user_goals = history_matchs[i].user_goals;
-        let opponent_goals = history_matchs[i].opponent_goals;
-        if(result === 'win'){
+        let date = stats_data.recent_matches[i].date;
+        let user_goals = stats_data.recent_matches[i].player_score;
+        let opponent_goals = stats_data.recent_matches[i].opponent_score;
+        if(stats_data.recent_matches[i].won === true){
             // result = 'Win';
             oponent_result = 'lose';
         }
@@ -297,6 +322,39 @@ function setWinningRate(percentage) {
 }
 
 export function display_winning_rate()
-{
-    setWinningRate(80);
+{   
+    setWinningRate(stats_data.stats.overall_win_rate);
+    const rates=stats_data.stats.overall_win_rate;
+    console.log('rates:',rates);
+    const win_numbers = document.getElementById("win-stats");
+    const lose_numbers = document.getElementById("lose-stats");
+    let win_n = stats_data.stats.wins;
+    console.log('win_n:::::::::::',win_n);
+    let lose_n = stats_data.stats.total_games - stats_data.stats.wins;
+    console.log('lose_n:::::::::::',lose_n);
+    win_numbers.innerHTML =
+    `
+        <p>${win_n} Wins</p>
+    `;
+    lose_numbers.innerHTML =
+    `
+        <p>${lose_n} Loses</p>
+    `;
+    let opponent = stats_data.recent_matches[stats_data.stats.total_games - 1].opponent;
+    let user_goals = stats_data.recent_matches[stats_data.stats.total_games - 1].player_score;
+    let opponent_goals = stats_data.recent_matches[stats_data.stats.total_games - 1].opponent_score;
+    const usernames = document.getElementsByClassName('usernames');
+    const score = document.getElementsByClassName('score');
+    // const player = document.getElementsByClassName('player');
+    const playerImages = document.querySelectorAll('.player img');
+    console.log('playerImages:',image_pr);
+    playerImages[0].src = image_pr;
+    // player[0].image.src =
+    usernames[0].innerHTML = username;
+    usernames[1].innerHTML = opponent;
+    score[0].innerHTML = `
+    0${user_goals} : 0${opponent_goals}
+    `;
+    
+    
 }

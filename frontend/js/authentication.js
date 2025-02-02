@@ -1,7 +1,5 @@
-import { handling_navigation } from "./main.js";
-
 let log42Complete = false;
-
+import { handling_navigation } from "./main.js";
 export function log42(){
     document.getElementById('log-42').addEventListener('click', async () => {
         console.log('Login with 42 button clicked');
@@ -223,11 +221,11 @@ export function login() {
                 const responseData = await response.json();
                 
                 // Store the token in localStorage
-                console.log('Token:', responseData.access_token);
                 // localStorage.setItem('authToken', responseData.access_token);
                 // khass dakshi i tsava f cookie mashi f local storage, rah kadoz l dashboard t9leb 3la access_token, so khassek tl9aha, wnta fash yalah katloga maatl9ahash
                 // btw, reda kaysseyfet l access_token f response_data as access_token, so khasssek t3ayet f response_data.access_token wnta kat9leb 3la response_data.token so ghatl9a teb ...
                 document.cookie = `access_token=${responseData.access_token}; path=/; Secure`;
+                document.cookie = `refresh_token=${responseData.refresh_token}; path=/; Secure`;
                 console.log('Login successful:', responseData);
                 // Redirect to the home page
                 import(`./main.js`).then(module => {
@@ -237,12 +235,6 @@ export function login() {
                 });
             } else {
                 const errorData = await response.json();
-                const wrongCredentials = document.getElementById('wrong-credentials');
-                wrongCredentials.textContent = "Wrong username or password";
-                wrongCredentials.style.color = 'red';
-                wrongCredentials.style.display = 'flex';
-                wrongCredentials.style.justifyContent = 'center';
-                wrongCredentials.style.textAlign = 'center';
                 console.error('1-Error:', errorData.error);
                 // document.getElementById('errorMessage').textContent = errorData.error;
             }
@@ -254,30 +246,47 @@ export function login() {
 }
 
 export async function logout() {
-    const access_token = getCookie('access_token');
     document.getElementById('logout-btn').addEventListener('click', async () => {
-        console.log("han hna--> ");
-        try{
-            const resp = await fetch('http://localhost:8000/api/logout/', {
+        try {
+            // Retrieve tokens from cookies
+            // const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+            //     const [key, value] = cookie.split('=');
+            //     acc[key] = value;
+            //     return acc;
+            // }, {});
+
+            const access_token = getCookie('access_token');
+            const refresh_token = getCookie('refresh_token');
+            console.log (access_token);
+
+            // Check if tokens exist
+            if (!access_token || !refresh_token) {
+                console.error('Tokens not found in cookies');
+                return;
+            }
+
+            // Make the API request
+            const resp = await fetch('http://127.0.0.1:8000/api/logout/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${access_token}`
+                    'Authorization': `Bearer ${access_token}`
                 },
+                body: JSON.stringify({ refresh: refresh_token }) // Send the refresh token in the body
             });
-            if(resp.ok)
-            {
+
+            if (resp.ok) {
                 console.log('Logout successful');
+                // Clear cookies by setting their expiry date in the past
                 document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 document.cookie = "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                // Redirect or handle navigation
                 return(handling_navigation('/login'));
+            } else {
+                console.error('Failed to logout. Status:', resp.status);
             }
-            else{
-                console.error('Failed to logout');
-            }
-        }
-        catch(error){
-            console.error('Error:', error);
+        } catch (error) {
+            console.error('Error during logout:', error);
         }
     });
 }

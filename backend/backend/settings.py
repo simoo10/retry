@@ -36,15 +36,20 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
     'api',
     'rest_framework_simplejwt',
-   
+    'channels',
+    'Ping',
+    'chat',
+    "rest_framework_simplejwt.token_blacklist"
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -134,12 +139,18 @@ SITE_ID = 1
 
 STATIC_URL = 'static/'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-OAUTH_42_CLIENT_ID = 'u-s4t2ud-748193493cc7a54fbe87da840701e2bd487f8af5e88c661e2c9f2a3dd66d1b90'
-OAUTH_42_CLIENT_SECRET = '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'
+OAUTH_42_CLIENT_ID = 'u-s4t2ud-66e7507845a8f855368de1c99a9c0d7ba0cd1ef350f00ba07403f12b18d290ac'
+OAUTH_42_CLIENT_SECRET = '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'
 OAUTH_42_REDIRECT_URI = 'http://localhost:8080/dashboard'
 OAUTH_42_AUTHORIZATION_URL = 'https://api.intra.42.fr/oauth/authorize'
 OAUTH_42_TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
@@ -202,4 +213,16 @@ SIMPLE_JWT = {
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
+
+# add asgi settings
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
 }

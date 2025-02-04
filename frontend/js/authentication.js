@@ -140,7 +140,11 @@ export function simplelog() {
         const password1 = document.getElementById('password1').value;
         console.log(password1);
         const password2 = document.getElementById('password2').value;
-
+        if (!validateInput(username) || !validateInput(password) || !validateInput(password1)|| !validateInput(password2)) {
+            console.error('Invalid input!!!!!!!!');
+            document.getElementById('wrong-credentials').textContent = "Invalid Input!!";
+            return;
+        }
         if (password1 !== password2) {
             alert("Passwords do not match");
             return;
@@ -203,7 +207,11 @@ export function login() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        
+        if (!validateInput(username) || !validateInput(password)) {
+            console.error('Invalid input!!!!!!!!');
+            document.getElementById('wrong-credentials').textContent = "Invalid Input!!";
+            return;
+        }
         const data = { username, password };
         console.log ("login by :", data);
     
@@ -236,6 +244,7 @@ export function login() {
             } else {
                 const errorData = await response.json();
                 console.error('1-Error:', errorData.error);
+                document.getElementById('wrong-credentials').textContent = "Wrong Credentials";
                 // document.getElementById('errorMessage').textContent = errorData.error;
             }
         } catch (error) {
@@ -291,6 +300,16 @@ export async function logout() {
     });
 }
 
+function validateInput(inputValue) {
 
+    let validRegex = /^[a-zA-Z0-9@-_.]+$/;
+
+    if (!validRegex.test(inputValue)) {
+
+        return false;
+    } else {
+        return true;
+    }
+}
 
 export {log42Complete};

@@ -162,6 +162,12 @@ body{
     background: linear-gradient(90deg, #F338F7 0%, #5B54FA 100%);
 
 }
+#username{
+    border-radius: 25px;
+    color: var(--text-color);
+    border-color: #9b9a9a;
+    background-color: transparent;
+}
 .login-input{
     padding-left: 22%;
     padding-top: 2%;
@@ -174,7 +180,7 @@ body{
 .form-control{
     width:25vw;
     background-color: transparent;
-    border-radius: 28px;
+    border-radius: 25px;
     height: 55px;;
     color: var(--text-color);
 }
@@ -274,7 +280,13 @@ p{
     background-image: var(--image);
     background-size: cover;
 }
-
+#wrong-credentials{
+    color: red;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 10px;
+}
 
 /*--------------------------small to medium screen css*-----------------*/
 

@@ -30,7 +30,8 @@ function render_profile(data){
         const jsonString = data.image.replace(/'/g, '"');
         const imageData = JSON.parse(jsonString);
         console.log(imageData);
-         profile_img = imageData.link;
+         profile_img = imageData.versions.small;
+        //  console.log('profile_img++++++++++++++=:',profile_img);
         //  image_pr = profile_img;
          
         // profile_img = data.image;
@@ -63,6 +64,7 @@ function render_profile(data){
     profile_img_style.style.width = '100px';
     profile_img_style.style.height = '100px';
     profile_img_style.style.marginRight = '15px';
+    profile_img_style.border = '5px solid rgb(0, 0, 0)';
     user_info.style.display = 'flex';
     user_info.style.flexDirection = 'column';
     user_info.style.marginTop = '20px';

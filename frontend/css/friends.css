@@ -218,11 +218,18 @@ main{
     font-family: 'Baloo Da', sans-serif;
     font-weight: bold;
 }
+.container-frd{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px;
+    margin-left: 10vw;
+    width: 47vw;
+}
 .friends-list{
     margin-top: 60px;
     display: flex;
     flex-wrap: wrap;
-    margin-left: 10vw;
     width: fit-content;
 }
 .butt-div{
@@ -236,7 +243,10 @@ main{
     color:#716c6c;
 }
 .add-friend-div{
-    margin-left: 15vw;
+    justify-content: flex-end;
+    padding-top: 50px;
+    width: fit-content;
+    height: fit-content;
 }
 #add-friend-btn{
     background-color: #26804A;
@@ -309,6 +319,6 @@ main{
 
 @media (max-width: 900px) {
     #search-input1{
-        width:300px ;
+        width:200px ;
     }
 }

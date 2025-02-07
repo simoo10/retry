@@ -36,15 +36,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'daphne',
+    # 'daphne',
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    # 'channels',
     'api',
     'rest_framework_simplejwt',
-    'channels',
-    'Ping',
-    'chat',
+    # 'Ping',
+    # 'chat',
     "rest_framework_simplejwt.token_blacklist"
 ]
 
@@ -139,11 +139,11 @@ SITE_ID = 1
 
 STATIC_URL = 'static/'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+# ]
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -219,7 +219,7 @@ SIMPLE_JWT = {
 
 
 # add asgi settings
-ASGI_APPLICATION = 'backend.asgi.application'
+# ASGI_APPLICATION = 'backend.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {

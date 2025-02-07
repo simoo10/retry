@@ -151,7 +151,7 @@ body{
     font-family: 'Inter', sans-serif;
     color: var(--text-color2) ;
     padding-top: 15vh;
-    padding-left: 40%;
+    padding-left: 18vw;
 }
 #subject::after{
     content: '';
@@ -290,30 +290,31 @@ p{
 
 /*--------------------------small to medium screen css*-----------------*/
 
-@media (max-width: 1400px) {
+@media (max-width: 991.50px) {
     .left-side{
         display: none;
     }
-    #login-title {
-        font-size: 80px;
+    #subject{
+        padding-left: 32vw;
     }
     .login-input{
         padding-left: 20%;
         font-size: 15px;
     }
     .form-control{
-        width: 250px;
+        width: 50vw;
     }
     label{
         padding-top: 10px;
     }
     .form-check{
-        margin-left: 50px;
+        /* margin-left: 50px; */
+        padding-left: 20vw;
         font-size: 12px;
     }
     .log-button{
         font-size: 14px;
-        width: 250px;
+        width: 50vw;
     }
     #or-line{
         padding-top: 1vh;

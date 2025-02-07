@@ -2,11 +2,27 @@ import random
 import os
 import numpy as np
 from collections      import deque
-from keras.models     import Sequential
-from keras.layers     import Dense
-from keras.optimizers import Adam
+# from keras.models     import Sequential
+# from keras.layers     import Dense
+# from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import Adam
 import time
 import logging
+import tensorflow as tf
+from tensorflow.keras.mixed_precision import set_global_policy
+set_global_policy('mixed_float16')
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF logging except errors
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Disable GPU
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations
+# os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
+
+print("\n\n\n\nTensorFlow version:", tf.__version__)
+print("\n\n\n\n\noneDNN enabled:", "ONEDNN" in tf.sysconfig.get_compile_flags())
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+print("Num CPUs Available: ", len(tf.config.experimental.list_physical_devices('CPU')))
 
 # Configure the logging
 logging.basicConfig(
@@ -17,7 +33,7 @@ logging.basicConfig(
 
 class DQNAgent():
     def __init__(self, state_size, action_size, Train):
-        self.weight_backup      = "pong_weight-5.keras"
+        self.weight_backup      = "pong_weight-8.keras"
         self.state_size         = state_size
         self.action_size        = action_size
         self.memory             = deque(maxlen=2000)
@@ -77,25 +93,56 @@ class DQNAgent():
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
 
+    # def replay(self):
+    #     while True:
+    #         if len(self.memory) < self.sample_batch_size:
+    #             continue
+    #         sample_batch = random.sample(self.memory, self.sample_batch_size)
+    #         # logging.debug(f"sample_batch: {sample_batch}")
+    #         for state, action, reward, next_state, done in sample_batch:
+    #             target = reward
+    #             if not done:
+    #                 target = reward + self.gamma * np.amax(self.brain.predict(next_state)[0])
+    #             target_f = self.brain.predict(state)
+    #             # logging.debug(f"target_f: {target_f}, target: {target}, action: {action}")
+    #             target_f[0][action] = target
+    #             self.brain.fit(state, target_f, epochs=1, verbose=0)
+    #         if self.exploration_rate > self.exploration_min:
+    #             self.exploration_rate *= self.exploration_decay
+    #         self.episode += 1
+    #         print ("episode = ", self.episode)
+    #         if self.episode % 100 == 0:
+    #             self.save_model()
+    #             self.episode = 1
+
     def replay(self):
-        while True:
-            if len(self.memory) < self.sample_batch_size:
-                continue
-            sample_batch = random.sample(self.memory, self.sample_batch_size)
-            # logging.debug(f"sample_batch: {sample_batch}")
-            for state, action, reward, next_state, done in sample_batch:
-                target = reward
-                if not done:
-                    target = reward + self.gamma * np.amax(self.brain.predict(next_state)[0])
-                target_f = self.brain.predict(state)
-                # logging.debug(f"target_f: {target_f}, target: {target}, action: {action}")
-                target_f[0][action] = target
-                self.brain.fit(state, target_f, epochs=1, verbose=0)
-            if self.exploration_rate > self.exploration_min:
-                self.exploration_rate *= self.exploration_decay
-            self.episode += 1
-            print ("episode = ", self.episode)
-            if self.episode % 100 == 0:
-                self.save_model()
-                self.episode = 1
+        if len(self.memory) < self.sample_batch_size:
+            return
+
+        sample_batch = random.sample(self.memory, self.sample_batch_size)
+        states = np.array([sample[0] for sample in sample_batch])
+        next_states = np.array([sample[3] for sample in sample_batch])
+
+        # Batch predictions
+        targets = self.brain.predict(states)
+        next_q_values = self.brain.predict(next_states)
+
+        for i, (state, action, reward, next_state, done) in enumerate(sample_batch):
+            target = reward
+            if not done:
+                target = reward + self.gamma * np.amax(next_q_values[i])
+            targets[i][action] = target
+
+        # Train on the batch
+        self.brain.fit(states, targets, epochs=1, verbose=0)
+
+        # Decay exploration rate
+        if self.exploration_rate > self.exploration_min:
+            self.exploration_rate *= self.exploration_decay
+
+        self.episode += 1
+        print("episode =", self.episode)
+        if self.episode % 100 == 0:
+            self.save_model()
+            self.episode = 1
                 

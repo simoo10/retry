@@ -3,11 +3,12 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .train_model import DQNAgent
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
 import threading
 import math
 import time
 import random
+
 
 import logging
 
@@ -167,13 +168,15 @@ class Player:
     
 # Create a class for the ball
 class Ball:
-
     def __init__(self, x, z, demonsions: Demonsions, direction):
         self.x = x
         self.z = z
         self.radius = demonsions.ball_radius
         self.speed = demonsions.ball_speed
-        self.direction = direction
+        
+        # Convert initial angle to direction components
+        self.direction_x = math.cos(direction)
+        self.direction_z = math.sin(direction)
 
         self.demonsions = demonsions
 
@@ -187,14 +190,18 @@ class Ball:
         self.prev_x = x
         self.prev_z = z
 
-    def change_direction(self, direction):
-        self.direction = direction
+    def normalize_direction(self):
+        """Normalize the direction vector to maintain consistent speed"""
+        magnitude = math.sqrt(self.direction_x ** 2 + self.direction_z ** 2)
+        if magnitude != 0:
+            self.direction_x /= magnitude
+            self.direction_z /= magnitude
 
     def move(self):
         self.prev_x = self.x
         self.prev_z = self.z
-        self.x += self.speed * math.cos(self.direction)
-        self.z += self.speed * math.sin(self.direction)
+        self.x += self.speed * self.direction_x
+        self.z += self.speed * self.direction_z
 
     def get_position(self):
         return self.x, self.z
@@ -206,7 +213,11 @@ class Ball:
         self.x = 0
         self.z = 0
         self.speed = self.demonsions.ball_speed
-        self.direction = random_angle()
+        # Convert random angle to direction components
+        angle = random_angle()
+        self.direction_x = math.cos(angle)
+        self.direction_z = math.sin(angle)
+        self.normalize_direction()
 
 # Create a class for the game
 class Game:
@@ -216,7 +227,7 @@ class Game:
         self.player2 = Player(demonsions, self.demonsions.table_x, self.demonsions.bottom_border_z * 0.9, names[1])
         self.ball = Ball(self.demonsions.table_x, self.demonsions.table_z, demonsions, random_angle())
         self.first = True
-        self.Train = False
+        self.Train = True
         self.predictedBallLanding = 0
         self.PreviousPredictedBallLanding = 0
         self.intervalTime = 0
@@ -224,7 +235,7 @@ class Game:
         self.collision = False
         self.movement = 0
 
-        self.WinScore = 3
+        self.WinScore = 1000
 
         self.online = False
 
@@ -246,8 +257,8 @@ class Game:
         self.action_size = 3
         self.state_size = 11
         self.agent = DQNAgent(self.state_size, self.action_size, self.Train)
-        self.state = np.array([[self.player2.x, self.player2.z, self.player2.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction, self.ball.direction,0, 0, 0]])
-        self.next_state = np.array([[self.player2.x, self.player2.z, self.player2.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction, self.ball.direction, 0, 0, 0]])
+        self.state = np.array([[self.player2.x, self.player2.z, self.player2.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction_x, self.ball.direction_z,0, 0, 0]])
+        self.next_state = np.array([[self.player2.x, self.player2.z, self.player2.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction_x, self.ball.direction_z, 0, 0, 0]])
         
         self.done = False
         self.reward = 0
@@ -261,7 +272,7 @@ class Game:
     # Function to predict where the ball will land
     def predictBallLanding(self, player):
         currentx, currentz = self.ball.get_position()
-        currentdirection = self.ball.direction
+        currentdirection = self.ball.direction_x
         currentspeed = self.ball.speed
 
         playerx, playerz = player.get_position()
@@ -409,51 +420,46 @@ class Game:
     
 
 
-    def predict_ball_landing(self, ball:Ball, player:Player, max_iterations=1000):
+    def predict_ball_landing(self, ball: Ball, player: Player, max_iterations=1000):
         """
-        Predict where the ball will land on the table using an iterative approach.
-        
-        :param ball: Ball object with x, y, speed, direction (in radians), and radius
-        :param table_width: Width of the Pong table
-        :param table_height: Height of the Pong table
-        :param max_iterations: Maximum number of bounces to consider
-        :return: Predicted x-coordinate of the ball's landing point
+        Predict where the ball will land using directional components
         """
         x = ball.x
         z = ball.z
-        direction = ball.direction
+        direction_x = ball.direction_x
+        direction_z = ball.direction_z
         speed = ball.speed
 
         for _ in range(max_iterations):
             # Calculate next position
-            new_x = x + speed * math.cos(direction)
-            new_z = z + speed * math.sin(direction)
-            
+            new_x = x + speed * direction_x
+            new_z = z + speed * direction_z
 
             # Check for vertical wall bounces (left and right walls)
             if new_x <= self.demonsions.left_border_x * 0.95:
                 new_x = self.demonsions.left_border_x * 0.95
-                direction = math.pi - direction
+                direction_x *= -1
                 if speed >= self.demonsions.ball_speed:
                     speed *= 0.95
             elif new_x >= self.demonsions.right_border_x * 0.95:
                 new_x = self.demonsions.right_border_x * 0.95
-                direction = math.pi - direction
+                direction_x *= -1
                 if speed >= self.demonsions.ball_speed:
                     speed *= 0.95
 
             # Check for horizontal wall bounces (top and bottom walls)
             if new_z <= self.demonsions.bottom_border_z * 0.97:
                 new_z = self.demonsions.bottom_border_z * 0.97
-                direction = -direction
+                direction_z *= -1
             elif new_z >= self.demonsions.top_border_z * 0.97:
                 new_z = self.demonsions.top_border_z * 0.97
-                direction = -direction
+                direction_z *= -1
             
             # Update position
             x = new_x
             z = new_z
-            # check if z is within the player's width
+            
+            # Check if z is within the player's width
             if z <= player.z + self.demonsions.player_height / 2 and z >= player.z - self.demonsions.player_height / 2:
                 return x
         
@@ -518,70 +524,103 @@ class Game:
 
     #     return reward
     def calculateReward(self, player: Player, predictedBallLanding):
+        """
+        Enhanced reward function that considers directional components and provides
+        more nuanced feedback for the AI agent's learning.
+        """
         reward = 0
         ball = self.ball
         dimensions = self.demonsions
 
-        # Precise Ball Interception Rewards
+        # 1. Ball Interception Positioning (0-3 points)
         ball_distance = abs(player.x - predictedBallLanding)
         paddle_coverage = dimensions.player_width
+        
+        if ball_distance <= paddle_coverage / 4:  # Perfect positioning
+            reward += 3.0
+        elif ball_distance <= paddle_coverage / 2:  # Very good positioning
+            reward += 2.0
+        elif ball_distance <= paddle_coverage:  # Acceptable positioning
+            reward += 1.0
+        else:  # Poor positioning
+            reward -= 1.0 * (ball_distance / paddle_coverage)  # Scaled penalty
 
-        # 1. Positioning Rewards
-        if ball_distance <= paddle_coverage / 2:
-            reward += 2.0  # Perfect positioning
-        elif ball_distance <= paddle_coverage:
-            reward += 1.0  # Good positioning
+        # 2. Movement Optimization (-1 to 1 points)
+        movement_efficiency = abs(player.x - player.prev_x)
+        target_movement = abs(predictedBallLanding - player.prev_x) / 10  # Ideal movement per step
+        
+        if movement_efficiency <= target_movement:
+            reward += 1.0  # Efficient movement
         else:
-            reward -= 1.5  # Poor positioning
+            reward -= (movement_efficiency - target_movement) * 2  # Penalty for excessive movement
 
-        # 2. Movement Efficiency
-        movement_penalty = abs(player.x - player.prev_x)
-        if movement_penalty < 0.01:
-            reward += 0.5  # Minimal unnecessary movement
-        else:
-            reward -= movement_penalty * 0.3  # Penalize excessive movement
+        # 3. Ball Direction Anticipation (-2 to 2 points)
+        # Reward for anticipating ball's trajectory
+        approaching_player = (ball.direction_z * player.z) > 0  # Ball moving towards player
+        if approaching_player:
+            direction_anticipation = abs(ball.direction_x) * (1 - abs(player.x - ball.x) / dimensions.table_width)
+            reward += direction_anticipation * 2
 
-        # 3. Anticipation and Prediction Rewards
-        prediction_accuracy = 1 - (abs(ball.x - predictedBallLanding) / dimensions.table_width)
-        reward += prediction_accuracy * 1.5
-
-        # 4. Collision Quality
+        # 4. Collision Quality (0-4 points)
         if self.collision:
-            # Reward based on how centrally the ball hits the paddle
-            central_hit_bonus = 1 - abs((ball.x - player.x) / (dimensions.player_width / 2))
-            reward += 2.0 + (central_hit_bonus * 1.0)
+            # Better collision detection using directional components
+            hit_position = (ball.x - player.x) / (dimensions.player_width / 2)
+            hit_velocity = math.sqrt(ball.direction_x**2 + ball.direction_z**2)
+            
+            # Reward for central hits and good deflection angles
+            central_hit_bonus = 1 - abs(hit_position)
+            velocity_bonus = min(hit_velocity, 1.0)
+            
+            reward += 2.0 * central_hit_bonus  # Up to 2 points for central hit
+            reward += 2.0 * velocity_bonus     # Up to 2 points for good deflection
 
-        # 5. Dynamic Speed and Angle Management
-        speed_factor = ball.speed / dimensions.ball_speed
-        angle_proximity = 1 - abs(ball.direction / math.pi)
-        reward += (speed_factor * angle_proximity) * 0.75
+        # 5. Strategic Positioning (-2 to 2 points)
+        # Encourage staying near the center when ball is far
+        ball_distance_to_player = math.sqrt((ball.x - player.x)**2 + (ball.z - player.z)**2)
+        if ball_distance_to_player > dimensions.table_height / 2:
+            center_position = 1 - abs(player.x) / (dimensions.right_border_x / 2)
+            reward += center_position * 2
+        
+        # 6. Ball Speed Management (-1 to 1 points)
+        # Reward for maintaining appropriate ball speed
+        optimal_speed_range = (dimensions.ball_speed, dimensions.ball_speed * 1.5)
+        if optimal_speed_range[0] <= ball.speed <= optimal_speed_range[1]:
+            reward += 1.0
+        else:
+            reward -= abs(ball.speed - dimensions.ball_speed) / dimensions.ball_speed
 
-        # 6. Defensive Positioning
-        if ball.z > player.z:  # Ball approaching player
-            center_proximity = 1 - abs(player.x) / (dimensions.right_border_x / 2)
-            reward += center_proximity * 0.5
-
-        # 7. Scoring and Game Progress Rewards
+        # 7. Game Progress Rewards
+        # Scoring
         if player.score > 0:
-            reward += player.score * 0.75  # Progressive scoring reward
+            reward += player.score * 1.0  # Progressive reward for scoring
 
-        # 8. Negative Consequences
+        # 8. Critical Events
+        # Severe penalties for losing points
         if ball.z < dimensions.bottom_border_z * 0.97:
-            reward -= 3.0  # Significant penalty for missing ball
-
+            reward -= 5.0  # Increased penalty for missing ball
+        
         # 9. Win Condition
         if player.score == self.WinScore:
-            reward += 10.0  # Major reward for winning
+            reward += 15.0  # Major reward for winning game
 
-        # 10. Advanced Boundary Management
-        boundary_proximity = 1 - abs(player.x - dimensions.table_x) / (dimensions.right_border_x / 2)
-        reward += boundary_proximity * 0.25
+        # 10. Recovery Behavior
+        # Reward for recovering from bad positions
+        if abs(player.prev_x) > abs(player.x):  # Moving towards center
+            recovery_factor = abs(player.prev_x) - abs(player.x)
+            reward += recovery_factor * 0.5
 
-        # Final normalization to prevent extreme values
-        reward = max(min(reward, 5.0), -5.0)
+        # 11. Direction Control Bonus
+        # Reward for maintaining good directional control
+        direction_magnitude = math.sqrt(ball.direction_x**2 + ball.direction_z**2)
+        if 0.9 <= direction_magnitude <= 1.1:  # Close to normalized
+            reward += 0.5
 
+        # Normalize final reward
+        reward = max(min(reward, 10.0), -10.0)
+
+        print ("reward = ", reward)
+        
         return reward
-    
     # Function to check if the ball hit the player
     def check_collision(self, ball: Ball, player: Player):
         """
@@ -678,54 +717,36 @@ class Game:
         ball_x, ball_z = ball.get_position()
         ball_radius = ball.get_radius()
         
-        # Calculate the boundaries of the player's paddle
-        player_left = player_x - player_width / 2
-        player_right = player_x + player_width / 2
-        player_top = player_z - player_height / 2
-        player_bottom = player_z + player_height / 2
-            
-        # Collision detected
-        # Calculate the hit position relative to the center of the paddle
-        hit_pos = (ball_x - player_x) / (player_width / 2)
+        # Calculate hit position relative to the center of the paddle (-1 to 1)
+        hit_pos_x = (ball_x - player_x) / (player_width / 2)
+        hit_pos_z = (player_z - ball_z) / (ball_radius / 2)
 
-        hit_ball = (player_z- ball_z) / (ball_radius / 2)
-
-        print ("hit = ", hit_ball)
+        # Calculate new direction components
+        # Reverse z direction and add influence from hit position
+        ball.direction_z *= -1
+        # Add some horizontal influence based on where the ball hit the paddle
+        ball.direction_x += hit_pos_x * 0.5  # Adjust multiplier to control effect strength
         
-        # Reflect the ball's direction based on where it hit the paddle
-        reflection_angle = hit_pos * (math.pi / 3)  # Max angle of 60 degrees
-        
-        # Change the ball's direction
-        if hit_ball > 0:
-            ball.direction = -ball.direction + hit_pos
-            if ball.direction < -(5 * math.pi) / 6:
-                ball.direction = -(5 * math.pi) / 6
-            elif ball.direction > -math.pi / 6:
-                ball.direction = -math.pi / 6
-        else:
-            ball.direction = -ball.direction - hit_pos
-            if ball.direction < math.pi / 6:
-                ball.direction = math.pi / 6
-            elif ball.direction > (5 * math.pi) / 6:
-                ball.direction = (5 * math.pi) / 6
-        # ball.direction *= -1
+        # Normalize the direction vector
+        ball.normalize_direction()
         
         # Optional: Increase the ball's speed slightly
-        ball.speed *= 1.05  # Increase speed by 5% for added challenge
+        ball.speed *= 1.05
+
+
     # Function to move the ball
     def moveBall(self):
         self.ball.move()
-        newAngle = 0
 
         # Check if the ball crossed the left or right borders
         if self.ball.x <= self.demonsions.left_border_x * 0.95:
             self.ball.x = self.demonsions.left_border_x * 0.95
-            self.ball.direction = math.pi - self.ball.direction
+            self.ball.direction_x *= -1  # Reverse x direction
             if self.ball.speed >= self.demonsions.ball_speed:
                 self.ball.speed *= 0.95
         elif self.ball.x >= self.demonsions.right_border_x * 0.95:
             self.ball.x = self.demonsions.right_border_x * 0.95
-            self.ball.direction = math.pi - self.ball.direction
+            self.ball.direction_x *= -1  # Reverse x direction
             if self.ball.speed >= self.demonsions.ball_speed:
                 self.ball.speed *= 0.95
 
@@ -733,32 +754,27 @@ class Game:
         if self.ball.z <= self.demonsions.bottom_border_z * 0.97:
             self.ball.z = self.demonsions.bottom_border_z * 0.97
             self.player1.score += 1
-            print ("player1 scored : ", self.player1.score)
+            print("player1 scored : ", self.player1.score)
             self.ball.reset()
         elif self.ball.z >= self.demonsions.top_border_z * 0.97:
             self.ball.z = self.demonsions.top_border_z * 0.97
             self.player2.score += 1
-            print ("player2 scored : ", self.player2.score)
+            print("player2 scored : ", self.player2.score)
             self.ball.reset()
         
         # Handle paddle collisions
         if self.check_collision(self.ball, self.player1):
-            # Prevent multiple collisions by checking if we're moving away from the paddle
             if not self.collision:
                 self.handle_collision_1(self.player1, self.ball)
                 self.collision = True
             while self.check_collision(self.ball, self.player1):
                 self.ball.move()
-                # self.ball.x = self.ball.prev_x
-                # self.ball.z = self.ball.prev_z
         elif self.check_collision(self.ball, self.player2):
             if not self.collision:
                 self.handle_collision_1(self.player2, self.ball)
                 self.collision = True
             while self.check_collision(self.ball, self.player2):
                 self.ball.move()
-                # self.ball.x = self.ball.prev_x
-                # self.ball.z = self.ball.prev_z
         else:
             self.collision = False
 
@@ -767,11 +783,11 @@ class Game:
     # Function to move the player by Ai agent
     def moveAIPlayer(self, player:Player, currTime):
         if player.name == "AI":
-            if currTime - self.prevTime >= 0 or self.first:
+            if currTime - self.prevTime >= 1 or self.first:
                 self.predictedBallLanding = self.predictBallLanding(player)
                 self.prevTime = currTime
                 player.movement = 0
-                self.state = np.array([[player.x, player.z, player.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction, self.ball.direction, self.predictedBallLanding - self.demonsions.player_width, self.predictedBallLanding + self.demonsions.player_width, player.movement]])
+                self.state = np.array([[player.x, player.z, player.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction_x, self.ball.direction_z, self.predictedBallLanding - self.demonsions.player_width, self.predictedBallLanding + self.demonsions.player_width, player.movement]])
                 self.state = np.reshape(self.state, [1, self.state_size])
                 print ("state = ", self.state)
             action = self.agent.act(self.state)
@@ -789,7 +805,7 @@ class Game:
 
             # calculate the reward
             if self.Train:
-                self.next_state = np.array([[player.x, player.z, player.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction, self.ball.direction, self.predictedBallLanding - self.demonsions.player_width, self.predictedBallLanding + self.demonsions.player_width, player.movement]])
+                self.next_state = np.array([[player.x, player.z, player.speed, self.ball.x, self.ball.z, self.ball.speed, self.ball.direction_x, self.ball.direction_z, self.predictedBallLanding - self.demonsions.player_width, self.predictedBallLanding + self.demonsions.player_width, player.movement]])
                 self.next_state = np.reshape(self.next_state, [1, self.state_size])
                 self.reward = self.calculateReward(player, self.predictedBallLanding)
                 self.agent.remember(self.state, action, self.reward, self.next_state, self.done)
@@ -886,6 +902,8 @@ class Game:
     def update(self, keys):
         self.keys = keys
         self.moveBall()
+        if self.player1.score == self.WinScore or self.player2.score == self.WinScore:
+            self.done = True
         self.movePlayer()
         self.done = False
         if self.player1.score == self.WinScore or self.player2.score == self.WinScore:

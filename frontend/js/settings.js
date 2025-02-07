@@ -1,4 +1,3 @@
-// import { fetching_data } from "./rendringData";
 let data_user ;
 
 export function getCookie(name) {

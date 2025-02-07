@@ -1,4 +1,4 @@
-///all the routes are defined here
+//all the routes are defined here
 import { fetching_data, getCookie } from "./rendringData.js"
 import { combinedChat, check_expiration } from "../game/js/setup2.js";
 
@@ -159,12 +159,55 @@ export async function handling_navigation(route, updateHistory = true) {
         get_content("404.html");
         history.pushState({ route }, "", route);
     }
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        try {
+            // Retrieve tokens from cookies
+            console.log("Logout button clicked");
+            const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+                const [key, value] = cookie.split('=');
+                acc[key] = value;
+                return acc;
+            }, {});
+
+            const access_token = cookies['access_token'];
+            const refresh_token = cookies['refresh_token'];
+
+            // Check if tokens exist
+            if (!access_token || !refresh_token) {
+                console.error('Tokens not found in cookies');
+                return;
+            }
+
+            // Make the API request
+            const resp = await fetch('http://127.0.0.1:8000/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access_token}`
+                },
+                body: JSON.stringify({ refresh: refresh_token }) // Send the refresh token in the body
+            });
+
+            if (resp.ok) {
+                console.log('Logout successful');
+                // Clear cookies by setting their expiry date in the past
+                document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                document.cookie = "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                // Redirect or handle navigation
+                handling_navigation('/login');
+            } else {
+                console.error('Failed to logout. Status:', resp.status);
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    });
 }
 export let stats_data="ff";
 export let img_prof = "";
 export async function matchs_stats(){
     try {
-        const response = await fetch(`http://localhost:8000/game/api/player-stats/${username}/`);
+        const response = await fetch(`http://localhost:8002/game/api/player-stats/${username}/`);
         console.log("Username: ", username);
         console.log("Response: ", response);
         console.log("Response: ", response.status);
@@ -183,6 +226,7 @@ export async function matchs_stats(){
         console.error('Error loading player stats:', error);
     }
 }
+
 //function to get the content of the template
 import { log42, login, handleCallbackResponse } from "./authentication.js";
 
@@ -254,14 +298,30 @@ export async function get_content(template){
                 home_navbar.style.display = "block";
             }
             if(template==="dashboard.html"){
+
+                // fetching previous games
+                try {
+                    const response = await fetch(`http://localhost:8002/game/api/player-stats/${username}/`);
+                    console.log("Username: ", username);
+                    console.log("Response: ", response);
+                    console.log("Response: ", response.status);
+                    // Check if the response is OK (status code 200-299)
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Player stats:', data);
+                } catch (error) {
+                    console.error('Error loading player stats:', error);
+                }
                 // if(!log42Complete){
                     //     console.log("!!!!!!!!!!!!!!!!!!!!!");
                     //     handling_navigation('/login');
                     //     return;
                     // }
                     stats_data = await matchs_stats();
-                    
-                    // console.log("Stat@@@@@@@@@@@@@@@: ",stats_data);
                     console.log("Dashboard 5assha t5dem!!");
                     import(`./rendringData.js`).then(module => {
                         module.fetching_data();
@@ -274,12 +334,6 @@ export async function get_content(template){
                     }).catch(error => {
                         console.error('Error in importing the module:', error);
                     } );
-                    import(`./authentication.js`).then(module => {
-                        module.logout();
-                    }).catch(error => {
-                        console.error('Error in importing the module:', error);
-                    }
-                    );
                 }
                 if(template==="settings.html"){
                     import(`./settings.js`).then(module => {
@@ -301,7 +355,6 @@ export async function get_content(template){
             }
             if(template==="landing.html" || template==="login.html" || template==="signup.html"){
                 const links = document.querySelectorAll('link[rel="stylesheet"]');
-    
                 links.forEach(link => {
                 if (link.getAttribute('href') === 'css/home.css') {
                 link.remove();
@@ -310,6 +363,8 @@ export async function get_content(template){
                 document.title = css_file;
                 profile_content.style.display = "none";
                 content.style.display = "block";
+                chat_content.style.display = "none";
+                console.log("chat content: ", chat_content);
                 content.innerHTML = data;
             }
             else if (template === "game.html") {
@@ -320,6 +375,7 @@ export async function get_content(template){
                 home_navbar.style.display = "none";
                 // nshowi l game content
                 game_content.style.display = "block";
+                chat_content.style.display = "block";
                 console.log ("start game");
             }
             else {
@@ -329,6 +385,7 @@ export async function get_content(template){
                 document.head.appendChild(navbar_css);
                 content.style.display = "none";
                 profile_content.style.display = "block";
+                chat_content.style.display = "block";
                 profile_content.innerHTML = data;
 
             }
@@ -345,7 +402,6 @@ export async function get_content(template){
 function drop(wind){
     wind.style.display = "none";
 }
-
 function pop_up(){
     const popup = document.getElementById('concept-modal');
     // const close = pop_up.querySelector('.close-btn');
@@ -358,9 +414,7 @@ function pop_up(){
 
 window.pop_up = pop_up;
 
-export function setUsername(newUsername) {
-    username = newUsername;
-}
+
 //function to change the css file
 
 function change_css(path) {
@@ -397,6 +451,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialRoute = window.location.pathname || "/landing";
     handling_navigation(initialRoute, false);
 });
+
+export function setUsername(newUsername) {
+    username = newUsername;
+}
 const toggleButton = document.getElementById("toggle-button");
 const sidebarMenu = document.getElementById("sidebarMenu");
 

@@ -233,15 +233,16 @@ class PongConsumer(AsyncWebsocketConsumer):
         while self.room_name in active_games and not self.done:
             # print ("loop")
             self.game.update(self.game.keys)
-            # =if self.game.Train == False:
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                self.game.get_state()
-            )
+            if self.game.Train == False or 1 == 1:
+                await self.channel_layer.group_send (
+                    self.room_group_name,
+                    self.game.get_state()
+                )
             if self.done == True and self.game.Train == True:
+                print ("game done 2--", self.game.get_state())
                 self.done = False
                 self.game.first = True
-            if self.game.Train == False:
+            if self.game.Train == False or 1 == 1:
                 await asyncio.sleep(0.016)  # 60 FPS
         winner = [self.game.player1, "player1"] if self.game.player1.score > self.game.player2.score else [self.game.player2, "player2"]
         # self.game.resetGame()

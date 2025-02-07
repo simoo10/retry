@@ -1322,7 +1322,7 @@ import { handling_navigation } from "../../js/main.js";
 
 export let currentWebSocket = null;
 export let currentGame = null;
-export let playing = false;
+let playing = false;
 
 export function getCurrentWebSocket ()  {
     return currentWebSocket;
@@ -1697,7 +1697,7 @@ class WebSocketManager {
             console.log ("failed");
             // pop up a notification that the game failed to start and close the socket
             // this.game.destroy();
-            this.toggleButtons(false);
+            this.toggleButtonss(false);
             this.showErrorNotification(data);
             this.close();
         }
@@ -1716,7 +1716,7 @@ class WebSocketManager {
         }
     }
 
-    toggleButtons(play) {
+    toggleButtonss(play) {
         const modeButtons = document.getElementById('mode-selection');
         const tournamentControls = document.getElementById('tournament-controls');
         const closeButton = document.getElementById('close-button');
@@ -2443,6 +2443,7 @@ export async function check_expiration (route) {
         const responseData = await response.json();
 
         setUsername(responseData.login);
+        console.log("User is logged in");
         combinedChat.login(username);
         return true;
     }
@@ -2504,20 +2505,21 @@ export async function check_expiration (route) {
 
 export function toggleButtons(play) {
     const modeButtons = document.getElementById('mode-selection');
-    const tournamentControls = document.getElementById('tournament-controls');
+    // const tournamentControls = document.getElementById('tournament-controls');
     const closeButton = document.getElementById('close-button');
     
     if (!playing && !play) {
         // redirect to dashboard
+        console.log("redirecting to dashboard : ", play, playing);
         handling_navigation('/dashboard');
     } else if (play) {
         modeButtons.style.display = 'none';
-        tournamentControls.style.display = 'none';
+        // tournamentControls.style.display = 'none';
         closeButton.style.display = 'block';
         playing = true;
     } else if (!play && playing) {
         modeButtons.style.display = 'flex';
-        tournamentControls.style.display = 'flex';
+        // tournamentControls.style.display = 'flex';
         closeButton.style.display = 'block';
         playing = false;
     }
@@ -2541,7 +2543,7 @@ export async function startGame(mode, online, friend) {
     newCanvas.id = 'gameCanvas';
     gameContainer.appendChild(newCanvas);
     
-    const wsUrl = "ws://localhost:8000/ws/pong/";
+    const wsUrl = "ws://localhost:8002/ws/pong/";
     currentGame = new Game();
     currentGame.online = online;
     currentWebSocket = new WebSocketManager(wsUrl, currentGame, mode, username, friend);
@@ -2561,6 +2563,7 @@ export class CombinedChatManager {
         this.activeSockets = {};
         this.friends = new Set();
         this.activeTab = null;
+        this.socket = null;
         this.initializeElements();
         this.attachEventListeners();
     }
@@ -2631,10 +2634,12 @@ export class CombinedChatManager {
             if (response.ok) {
                 this.currentUser = username;
                 this.elements.connectionStatus.className = 'status-online';
-                this.addSystemMessage(`Logged in as ${username}`);
                 console.log('Login successful:', username);
                 // await this.fetchFriendList();
-                this.establishStandByWebSocket();
+                if (this.socket == null) {
+                    this.addSystemMessage(`Logged in as ${username}`);
+                    this.establishStandByWebSocket();
+                }
             }
         } catch (error) {
             console.error('Login failed:', error);
@@ -2722,10 +2727,11 @@ export class CombinedChatManager {
         });
     }
 
-    establishStandByWebSocket() {
+    async establishStandByWebSocket() {
         console.log('Establishing standby WebSocket connection');
-        const socket = new WebSocket(`ws://localhost:8000/chat/`);
-        
+        const socket = new WebSocket(`ws://localhost:8001/chat/`);
+        this.socket = socket;
+
         socket.onopen = () => {
             socket.send(JSON.stringify({
                 type: 'standby',

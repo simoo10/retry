@@ -1,5 +1,7 @@
-let log42Complete = false;
 import { handling_navigation } from "./main.js";
+
+let log42Complete = false;
+
 export function log42(){
     document.getElementById('log-42').addEventListener('click', async () => {
         console.log('Login with 42 button clicked');
@@ -140,11 +142,7 @@ export function simplelog() {
         const password1 = document.getElementById('password1').value;
         console.log(password1);
         const password2 = document.getElementById('password2').value;
-        if (!validateInput(username) || !validateInput(password) || !validateInput(password1)|| !validateInput(password2)) {
-            console.error('Invalid input!!!!!!!!');
-            document.getElementById('wrong-credentials').textContent = "Invalid Input!!";
-            return;
-        }
+
         if (password1 !== password2) {
             alert("Passwords do not match");
             return;
@@ -207,11 +205,7 @@ export function login() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        if (!validateInput(username) || !validateInput(password)) {
-            console.error('Invalid input!!!!!!!!');
-            document.getElementById('wrong-credentials').textContent = "Invalid Input!!";
-            return;
-        }
+        
         const data = { username, password };
         console.log ("login by :", data);
     
@@ -229,11 +223,11 @@ export function login() {
                 const responseData = await response.json();
                 
                 // Store the token in localStorage
+                console.log('Token:', responseData.access_token);
                 // localStorage.setItem('authToken', responseData.access_token);
                 // khass dakshi i tsava f cookie mashi f local storage, rah kadoz l dashboard t9leb 3la access_token, so khassek tl9aha, wnta fash yalah katloga maatl9ahash
                 // btw, reda kaysseyfet l access_token f response_data as access_token, so khasssek t3ayet f response_data.access_token wnta kat9leb 3la response_data.token so ghatl9a teb ...
                 document.cookie = `access_token=${responseData.access_token}; path=/; Secure`;
-                document.cookie = `refresh_token=${responseData.refresh_token}; path=/; Secure`;
                 console.log('Login successful:', responseData);
                 // Redirect to the home page
                 import(`./main.js`).then(module => {
@@ -243,8 +237,13 @@ export function login() {
                 });
             } else {
                 const errorData = await response.json();
+                const wrongCredentials = document.getElementById('wrong-credentials');
+                wrongCredentials.textContent = "Wrong username or password";
+                wrongCredentials.style.color = 'red';
+                wrongCredentials.style.display = 'flex';
+                wrongCredentials.style.justifyContent = 'center';
+                wrongCredentials.style.textAlign = 'center';
                 console.error('1-Error:', errorData.error);
-                document.getElementById('wrong-credentials').textContent = "Wrong Credentials";
                 // document.getElementById('errorMessage').textContent = errorData.error;
             }
         } catch (error) {
@@ -258,14 +257,14 @@ export async function logout() {
     document.getElementById('logout-btn').addEventListener('click', async () => {
         try {
             // Retrieve tokens from cookies
-            // const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
-            //     const [key, value] = cookie.split('=');
-            //     acc[key] = value;
-            //     return acc;
-            // }, {});
+            const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+                const [key, value] = cookie.split('=');
+                acc[key] = value;
+                return acc;
+            }, {});
 
-            const access_token = getCookie('access_token');
-            const refresh_token = getCookie('refresh_token');
+            const access_token = cookies['access_token'];
+            const refresh_token = cookies['refersh_token'];
             console.log (access_token);
 
             // Check if tokens exist
@@ -290,7 +289,7 @@ export async function logout() {
                 document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 document.cookie = "refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 // Redirect or handle navigation
-                return(handling_navigation('/login'));
+                handling_navigation('/login');
             } else {
                 console.error('Failed to logout. Status:', resp.status);
             }
@@ -300,16 +299,5 @@ export async function logout() {
     });
 }
 
-function validateInput(inputValue) {
-
-    let validRegex = /^[a-zA-Z0-9@-_.]+$/;
-
-    if (!validRegex.test(inputValue)) {
-
-        return false;
-    } else {
-        return true;
-    }
-}
 
 export {log42Complete};

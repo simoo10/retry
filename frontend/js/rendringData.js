@@ -239,12 +239,12 @@ export function display_match_history()
     console.log('image_pr""""""""""""""""""":',image_pr);
 
     console.log('stats+++++++++++++++=:',stats_data);
+    let result;
+    let user = username;
     const history = document.getElementById("history-body"); 
     history.innerHTML = '';
     for(let i=0; i<stats_data.stats.total_games; i++)
     {
-        let user = username;
-        let result;
         let opponent = stats_data.recent_matches[i].opponent;
         if(stats_data.recent_matches[i].won===true){
             result = 'Win';
@@ -322,7 +322,7 @@ function setWinningRate(percentage) {
 }
 
 export function display_winning_rate()
-{   
+{   let result;
     setWinningRate(stats_data.stats.overall_win_rate);
     const rates=stats_data.stats.overall_win_rate;
     console.log('rates:',rates);
@@ -340,11 +340,28 @@ export function display_winning_rate()
     `
         <p>${lose_n} Loses</p>
     `;
-    let opponent = stats_data.recent_matches[stats_data.stats.total_games - 1].opponent;
-    let user_goals = stats_data.recent_matches[stats_data.stats.total_games - 1].player_score;
-    let opponent_goals = stats_data.recent_matches[stats_data.stats.total_games - 1].opponent_score;
+    console.log('ssssssssssssssss!!!!!!!');
+    const ii = stats_data.stats.total_games -stats_data.stats.total_games+ 1;
+    let opponent = stats_data.recent_matches[0].opponent;
+    console.log('rrrrrrrrrrrrrrrrrrr!!!!!!!');
+    let user_goals = stats_data.recent_matches[0].player_score;
+    let opponent_goals = stats_data.recent_matches[0].opponent_score;
     const usernames = document.getElementsByClassName('usernames');
     const score = document.getElementsByClassName('score');
+    const match_container= document.getElementsByClassName('match-container');
+    const win_button = document.getElementById('wins-button');
+    // console.log('ssssssssssssssss!!!!!!!');
+    match_container[0].innerHTML = `
+                <div class="player">
+                    <img src="../images/avatar.png" alt="Player 1"id="player1">
+                    <p class="usernames">USERNAME</p>
+                </div>
+                <div class="score">XX:XX</div>
+                <div class="player">
+                    <img src="../images/avatar.png" alt="Player 2" id="player2">
+                    <p class="usernames">USERNAME</p>
+                </div>
+    `
     // const player = document.getElementsByClassName('player');
     const playerImages = document.querySelectorAll('.player img');
     console.log('playerImages:',image_pr);
@@ -355,6 +372,16 @@ export function display_winning_rate()
     score[0].innerHTML = `
     0${user_goals} : 0${opponent_goals}
     `;
+    if(stats_data.recent_matches[0].won===true){
+        result = 'Win';
+        win_button.style.backgroundColor = 'rgb(40, 152, 109)';
+        win_button.innerHTML = 'Win';
+    }
+    else{
+        result = 'Lose';
+        win_button.style.backgroundColor = 'rgb(179, 20, 20)';
+        win_button.innerHTML = 'Lose';
+    }
     
     
 }

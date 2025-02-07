@@ -31,6 +31,7 @@
     font-family: 'Baloo Da', sans-serif;
     color: var(--text-color);
     margin-top: 20px;
+
 }
 
 .profile {
@@ -153,8 +154,8 @@
 }
 
 /* Win Button */
-.win-button {
-    background-color: #32a852;
+#wins-button {
+    background-color: #8e8f97;
     color: white;
     border: none;
     padding: 12px;
@@ -163,10 +164,12 @@
     width: 90%;
     /* margin-bottom: 2vw; */
     border-radius: 5px;
+    cursor:default
 }
 
 .win-button:hover {
-    background-color: #289d48;
+    background-color: #000000;
+    /* cursor:move; */
 }
 
 

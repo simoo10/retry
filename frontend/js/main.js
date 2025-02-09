@@ -149,12 +149,15 @@ export async function handling_navigation(route, updateHistory = true) {
                 return (handling_navigation('/login'));
         }
     }
-
-    if (exact_route) {
-        get_content(exact_route.template);
-        if (updateHistory) {
+    if (updateHistory && history.state?.route !== route) {
             history.pushState({ route }, "", route);
-        }
+            console.log("History Updated:", history.state);
+    }
+    if (exact_route) {
+        
+        get_content(exact_route.template);
+        
+    
     } else {
         get_content("404.html");
         history.pushState({ route }, "", route);

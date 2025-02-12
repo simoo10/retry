@@ -218,7 +218,7 @@
 
 .custom-table th {
     background-color: var(--background-color4);
-    color: #FFFFFF;
+    color: var(--text-color);
     font-family: 'Inter', sans-serif;
     
 }

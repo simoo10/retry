@@ -1,5 +1,5 @@
 //all the routes are defined here
-import { fetching_data, getCookie } from "./rendringData.js"
+import { fetching_data, getCookie,display_friends_list} from "./rendringData.js"
 import { combinedChat, check_expiration } from "../game/js/setup2.js";
 
 
@@ -351,6 +351,7 @@ export async function get_content(template){
                     import(`./rendringData.js`).then(module => {
                         module.displayWindow();
                         module.friendsRequest();
+                        module.display_friends_list();
                     }
                 ).catch(error => {
                     console.error('Error in importing the module:', error);
@@ -483,6 +484,13 @@ sidebarMenu.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
+const buttons = document.querySelectorAll('.sidebar-content');
+    buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        });
+    });
 
 // export {username};
 

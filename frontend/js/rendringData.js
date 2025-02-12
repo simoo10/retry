@@ -134,8 +134,16 @@ export async function friendsRequest() {
         }
     });
 }
-
 export function displayWindow(window){
+    const buttons = document.querySelectorAll('.friends-hover');
+    buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        });
+    });
+
+
     const windows = document.getElementsByClassName('friends-windows');
     if(!window)
     {
@@ -148,7 +156,6 @@ export function displayWindow(window){
         windows[i].style.display = 'none';
     }
     console.log(window);
-   // document.getElementById(window).style.display = 'block';
     my_window.style.display = 'block';
     if(window ==='add-friends'){
         document.getElementsByClassName('lists')[0].style.backgroundColor = 'transparent';
@@ -386,4 +393,218 @@ export function display_winning_rate()
     }
     
     
+}
+
+const friends = [
+    {
+        "id": 1,
+        "username": "user1",
+        "fullname": "User One",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "pending",
+    },
+    {
+        "id": 2,
+        "username": "user2",
+        "fullname": "User Two",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "accepted",
+    },
+    {
+        "id": 3,
+        "username": "user3",
+        "fullname": "User Three",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "blocked",
+    },
+    {
+        "id": 4,
+        "username": "user4",
+        "fullname": "User Four",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "pending",
+    },
+    {
+        "id": 5,
+        "username": "user5",
+        "fullname": "User Five",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "accepted",
+    },
+    {
+        "id": 6,
+        "username": "user6",
+        "fullname": "User Six",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "blocked",
+    },
+    {
+        "id": 7,
+        "username": "user7",
+        "fullname": "User Seven",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "pending",
+    },
+    {
+        "id": 8,
+        "username": "user8",
+        "fullname": "User Eight",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "accepted",
+    },
+    {
+        "id": 9,
+        "username": "user9",
+        "fullname": "User Nine",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "blocked",
+    },
+    {
+        "id": 10,
+        "username": "user10",
+        "fullname": "User Ten",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "pending",
+    },
+    {
+        "id": 11,
+        "username": "user11",
+        "fullname": "User Eleven",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "accepted",
+    },
+    {
+        "id": 12,
+        "username": "user12",
+        "fullname": "User Twelve",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "blocked",
+    },
+    {
+        "id": 13,
+        "username": "user13",
+        "fullname": "User Thirteen",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "pending",
+    },
+    {
+        "id": 14,
+        "username": "user14",
+        "fullname": "User Fourteen",
+        "image": "images/avatar.png",
+        "status": "offline",
+        "request": "accepted",
+    },
+    {
+        "id": 15,
+        "username": "user15",
+        "fullname": "User Fifteen",
+        "image": "images/avatar.png",
+        "status": "online",
+        "request": "blocked",
+    },
+];
+
+
+export function display_friends_list()
+{
+    const friendsList = document.getElementById('all');
+    const blockedList = document.getElementById('blocked');
+    const pendingList = document.getElementById('pending');
+    const onlineList = document.getElementById('online-list');
+    console.log('11111##########################');
+    friendsList.innerHTML = `
+        <h3>All friends <span class="friend-count">7</span></h3>
+        `;
+    blockedList.innerHTML = `
+        <h3>Blocked <span class="friend-count">2</span></h3>
+        `;
+    pendingList.innerHTML = `
+        <h3>Pending <span class="friend-count">3</span></h3>
+        `;
+    onlineList.innerHTML = `
+        <h3>Online <span class="friend-count">4</span></h3>
+        `;
+    for(let i=0; i<friends.length-1; i++)
+    {
+        if(friends[i].request=== 'accepted')
+        {
+            friendsList.innerHTML += `
+            <div class="friend" id="full-list">
+                <img src="../images/avatar.png" class="avatar">
+                <div class="friend-info">
+                    <p class="username">${friends[i].username}</p>
+                    <p class="fullname">${friends[i].fullname}</p>
+                </div>
+                <div class="actions">
+                    <button class="challenge">⚑</button>
+                    <button class="remove">❌</button>
+                    <button class="view">➡️</button>
+                </div>
+            </div>
+    `;
+        }
+        else if(friends[i].request=== 'blocked')
+        {
+            blockedList.innerHTML += `
+            <div class="friend" id="blocked-list">
+                <img src="../images/avatar.png" class="avatar">
+                <div class="friend-info">
+                    <p class="username">${friends[i].username}</p>
+                    <p class="fullname">${friends[i].fullname}</p>
+                </div>
+                <div class="actions">
+                    <button class="unblock">🚫</button>
+                </div>
+            </div>
+    `;
+        }
+        else if(friends[i].request=== 'pending')
+        {
+            pendingList.innerHTML += `
+            <div class="friend" id="pending-list">
+                <img src="../images/avatar.png" class="avatar">
+                <div class="friend-info">
+                    <p class="username">${friends[i].username}</p>
+                    <p class="fullname">${friends[i].fullname}</p>
+                </div>
+                <div class="actions">
+                    <button class="accept">✅</button>
+                    <button class="reject">❌</button>
+                </div>
+            </div>
+    `;
+        }
+        if(friends[i].status === 'online' && friends[i].request === 'accepted')
+        {
+            onlineList.innerHTML += `
+            <div class="friend" id="online-list">
+                <img src="../images/avatar.png" class="avatar">
+                <div class="friend-info">
+                    <p class="username">${friends[i].username}</p>
+                    <p class="fullname">${friends[i].fullname}</p>
+                </div>
+                <div class="actions">
+                    <button class="challenge">⚑</button>
+                    <button class="remove">❌</button>
+                    <button class="view">➡️</button>
+                </div>
+            </div>
+    `;
+        }
+    }
+
 }

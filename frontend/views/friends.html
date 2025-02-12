@@ -6,7 +6,7 @@
     <div class="container-frd">
     <div class="friends-list">
             <div class="butt-div">
-                <a onclick="displayWindow('online-list')" class="friends-hover" id="online-btn" style="color:#716c6c">Online</a>
+                <a onclick="displayWindow('online-list')" class="active friends-hover" id="online-btn" style="color:#716c6c">Online</a>
             </div>
             <div class="butt-div">
                 <a onclick="displayWindow('all')" class="friends-hover" id="all-btn" style="color:#716c6c">All</a>
@@ -34,21 +34,6 @@
     <div class="frds-cadre">
     <div class="col-lg-7 col-md-8 col-sm-9 col-xs-8 lists">
         <div id="online-list" class="friends-windows">
-            <h3>online <span><!--online number--></span></h3>
-            <ul class="flex" id="list1">
-                <li class="d-flex" >
-                    <img src="images/avatar.png" alt="profile" style="width: 25px;height: 25px;">
-                    <!-- <div class="usr">
-                        <span class="username">Username</span>
-                    </div>
-                    <div class="utility">
-                        <button type="button" id="play-btn"><i class="bi bi-flag-fill icoon"></i></button>
-                        <button type="button" id="chat-btn"><i class="bi bi-chat-fill icoon"></i></button>
-                        <button type="button" id="play-btn"><i class="bi bi-x-circle-fill icoon"></i></button>
-                        <button type="button" id="play-btn"><i class="bi bi-arrow-right-circle-fill icoon"></i></button>
-                    </div> -->
-                </li>
-            </ul>
         </div> 
         <div id="add-friends" class="friends-windows" style="display: none;">
             <div class="friends-search" style="margin-left: 0;">
@@ -63,25 +48,25 @@
             <div id="request-resp"></div>
         </div>
         <div id="all" class="friends-windows">
-            <h3>All friends <span><!--online number--></span></h3>
-            <ul class="flex" id="list1">
-               
-            </ul>
+            <!-- <h3>All friends <span class="friend-count">7</span></h3>
+            <div class="friend" id="full-list">
+                <img src="../images/avatar.png" alt="Avatar" class="avatar">
+                <div class="friend-info">
+                    <p class="username">username</p>
+                    <p class="fullname">fullname</p>
+                </div>
+                <div class="actions">
+                    <button class="challenge">⚑</button>
+                    <button class="message">💬</button>
+                    <button class="remove">❌</button>
+                    <button class="view">➡️</button>
+                </div>
+            </div> -->
         </div> 
         <div id="pending" class="friends-windows">
-            <h3>pending <span><!--online number--></span></h3>
-            <ul class="flex" id="list1">
-
-            </ul>
         </div> 
         <div id="blocked" class="friends-windows">
-            <h3>blocked <span><!--online number--></span></h3>
-            <ul class="flex" id="list1">
-
-            </ul>
         </div> 
-        <div id="all" class="friends-windows">
-        </div>
     </div>
     </div>
 </div>

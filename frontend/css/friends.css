@@ -260,6 +260,10 @@ main{
     color: #164871;
     cursor: pointer;
 }
+.friends-hover.active{
+    color: #164871;
+    background-color: #5a04c3;
+}
 .friends-search{
     display: flex;
     margin-top: 20px;
@@ -273,11 +277,12 @@ main{
 .lists{
     margin-top: 20px;
     margin-left: 10vw;
-    display: flex;
-    flex-wrap: wrap;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
     background-color: #141622;
     /* width: 42vw; */
     height: 50vh;
+    overflow: auto;
 }
 .lists h3{
     color: #FFFFFF;
@@ -314,7 +319,71 @@ main{
     background-color: #615FED;
    
 }
+.friend {
+    display: flex;
+    align-items: center;
+    background:transparent;
+    margin-bottom: 0px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #331d97;
+    border-left: none;
+    border-right: none;
+}
 
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.friend-info {
+    flex-grow: 1;
+    flex-direction: column;
+    /* border: 1px solid #FFFFFF; */
+    /* padding-top: 0px; */
+}
+
+.username {
+    font-weight: bold;
+    color: #FFFFFF;
+    margin: 0;
+}
+.fullname{
+    color: #FFFFFF;
+    margin: 0;
+}
+.status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.online {
+    background-color: green;
+}
+
+.offline {
+    background-color: red;
+}
+
+.actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    color: white;
+}
+
+/* #full-list{
+    display: row;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+} */
 
 
 @media (max-width: 900px) {

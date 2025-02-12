@@ -112,6 +112,9 @@ body {
     color: #5356FB;
     cursor: pointer;
 }
+.sidebar-content.active {
+    color: #5356FB;
+}
 
 li {
     margin-top: 20px;

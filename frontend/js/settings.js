@@ -1,3 +1,5 @@
+
+import { image_pr } from  "./rendringData.js";
 let data_user ;
 
 export function getCookie(name) {
@@ -26,9 +28,8 @@ export async function get_data(){
         });
         if(response.ok){
             data_user = await response.json();
-            console.log("hhhh-:>>",data_user);
-            // render_profile(data);
-            // return(data);
+            // console.log("data_user|||||||||||||||||||||||||::::::::::::::",data_user);
+            return data_user;
         }
         else{
             console.error('Failed to fetch data');
@@ -38,14 +39,24 @@ export async function get_data(){
         console.error('Error fetching data:', error);
     }
 }
-
-export function uploadAvatar()
+export async function render_img_update(){
+    const data_us = await get_data();
+    let img_pic;
+    if(data_us.image){
+        const jsonString = data_us.image.replace(/'/g, '"');
+        const imageData = JSON.parse(jsonString);
+        console.log(imageData);
+         img_pic = imageData.versions.small;
+    }
+    document.getElementById('avatar').src = img_pic;
+}
+export async function uploadAvatar()
 {
     
-    document.getElementById("avatarUpload").click();console.log("ghayhrblya3!!!");
+    // console.log("data_pr::::::::::::::",data_pr);
+    document.getElementById("avatarUpload").click();
 }
 document.getElementById('avatarUpload').addEventListener('change', function (event) {
-    console.log("ghayhrblya!!!");
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -55,6 +66,8 @@ document.getElementById('avatarUpload').addEventListener('change', function (eve
         reader.readAsDataURL(file);
     }
 });
+
+window.uploadAvatar = uploadAvatar;
 
 // function render_data()
 // {

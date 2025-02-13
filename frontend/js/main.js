@@ -1,5 +1,5 @@
 //all the routes are defined here
-import { fetching_data, getCookie,display_friends_list} from "./rendringData.js"
+import { fetching_data, getCookie,display_friends_list, image_pr} from "./rendringData.js"
 import { combinedChat, check_expiration } from "../game/js/setup2.js";
 
 
@@ -207,6 +207,7 @@ export async function handling_navigation(route, updateHistory = true) {
     });
 }
 export let stats_data="ff";
+export let profile_picture = "";
 export let img_prof = "";
 export async function matchs_stats(){
     try {
@@ -331,8 +332,9 @@ export async function get_content(template){
                         console.log("Image:------------------------- ",img_prof);
                         module.display_match_history();
                         (async () => {
-                            await fetching_data(); // Wait for `fetchProfileImage()` to complete
-                            module.display_winning_rate();         // Call only after `image_pr` is set
+                            profile_picture = await fetching_data(); // Wait for `fetchProfileImage()` to complete
+                            console.log("Profile Picture:::::::::: ", profile_picture);
+                            module.display_winning_rate();
                         })();
                     }).catch(error => {
                         console.error('Error in importing the module:', error);
@@ -343,6 +345,7 @@ export async function get_content(template){
                         // module.uploadAvatar();
                         module.send_editing_data();
                         module.get_data();
+                        module.render_img_update();
                     }).catch(error => {
                         console.error('Error in importing the module:', error);
                     } );

@@ -1,30 +1,77 @@
+/* #settings-page{
+    display: flex;
+    justify-content: center;
+} */
+:root{
+    --background-color: #1D1F2E;
+    --background-color2: #141622;
+    --text-color:#ffffff;
+    --image: url('/images/darkmode.png');
+}
+[data-theme="light"]{
+    --background-color: #f5e0fff1;
+    --background-color2: #E3E3FD;
+    --text-color:#000000;
+    --image: url('/images/lightmode.png');
+}
+
 #settings-title {
     font-size: 45px;
     font-family: 'Baloo Da', sans-serif;
     color: #ffffff;
     margin-top: 20px;
     margin-bottom: 50px;
+}.profile-contain {
+    display: flex;
+    justify-content: center;
 }
 .profile-update {
-    display:flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    margin-top: 15vh;
+    margin-top: 10vh;
+    background: #1b2335;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
-#avatar{
-    width: 80px;
-    height: 80px;
-    /* margin-left: 50px; */
-    margin-top: 10px;
+
+#upload-avatar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#avatar {
+    width: 50px;  
+    height: 50px;
     border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    margin-right: 15px;
+}
+
+#photo-upd {
+    flex-grow: 1;
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    /* transition: background 0.3s; */
+    text-align: center;
+}
+
+#photo-upd:hover {
+    background: #5a6268;
 }
 label{
     color:#ffffff;
-    font-size: 25px;
-    margin-right: 50px;
+    font-size: 20px;
+    padding-left: 50px;
     width: 200px;
-    font-family: 'Istok Bold', sans-serif;
+    font-family: 'Istok Web', sans-serif;
+    text-align: left;
 }
 input{
     width: 22vw;
@@ -38,19 +85,7 @@ input{
     border: 2px solid #ffffff;
     border-radius: 20px;
 }
-#photo-upd{
-    width: 13.2vw;
-    height: 60px;
-    font-size: 20px;
-    margin-left: 6vw;
-    margin-bottom: 40px;
-    align-items: center;
-    justify-content: center;
-    background-color: #a5a7b5;
-    color: #ffffff;
-    border: 2px solid #ffffff;
-    border-radius: 20px;
-}
+
 #save-btn{
     width: 20vw;
     height: 70px;
@@ -61,8 +96,3 @@ input{
     border-radius: 80px;
 }
 
-@media (max-width:900px) {
-    input{
-        width: 200px;
-    }
-}

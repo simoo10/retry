@@ -87,6 +87,7 @@ export async function fetching_data(){
             const data = await response.json();
             console.log('!!!',render_profile(data));
             image_pr = render_profile(data);
+            // console.log('image_pr:::::::::::::::::::::::::::::::;;;;',image_pr);
             return(image_pr);
         }
         else{
